@@ -1,1 +1,2 @@
-//This file is where we'll write the communication that we'll run on the Arduino.
+//This file is where we'll write the communication that we'll run on the Arduino. 
+//The Arduino will communicate with both the radar chip and the external computer.
