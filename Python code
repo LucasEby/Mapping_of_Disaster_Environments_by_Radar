@@ -1,56 +1,24 @@
 #This file will hold the Python side of the communication. It will be run on the External Computer
 
-#All of the lines below were imported from my computer temporarily.
+# How to check what port Mac is connected to:
+#       https://www.mathworks.com/help/supportpkg/arduinoio/ug/find-arduino-port-on-windows-mac-and-linux.html
 
-# This is a sample Python script.
+# ^ Without the "", the terminal command is: "ls /dev/*"
+# The port your Arduino is connected to starts with "/dev/tty.usbmodem*" or "/dev/tty.usbserial*".
+#       (The port number is the *).
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-#import serial
-#import time
-
-#arduino = serial.Serial('COM1', 9600)
-#time.sleep(2)
-
-#print("Enter 1 to turn ON LED and 0 to turn OFF LED")
-
-#while 1;
-#    dataFromUser = input()
-
-#    if dataFromUser == '1':
-#        arduino.write(b'1')
-#        print("LED turned ON")
-#    elif dataFromUser == '0':
-#        arduino.write('0')
-#        print("LED turned OFF")
-
-#def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-#    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-#if __name__ == '__main__':
-#    print_hi('PyCharm')
+# Pyserial library documentation: https://pythonhosted.org/pyserial/index.html
+# Time library documentation: https://docs.python.org/3/library/time.html
 
 import serial
-#import os
 import time
-ser = serial.Serial('/dev/ttyACM1', 9600)
-ser.write('110,')
 
-#import os
-#os.getcwd()
+ser = serial.Serial('/dev/tty.usbserial-DN051AHX')  # open serial port
+print(ser.name)         # check which port was really used (not really needed)
 
-#import time
-file = open('samples.csv')
-while 1:
-   line = file.readline()
-   if not line:
-         break
-   ser.write(line)
-   time.sleep(3)
+# For loop to test a series of messages. Ideally we should test exactly how fast we can send and receive messages.
+ser.write(b'hello')     # write a string
+time.sleep(2) # sleep for 2 seconds
 
-file.close()
+
+ser.close()             # close port
