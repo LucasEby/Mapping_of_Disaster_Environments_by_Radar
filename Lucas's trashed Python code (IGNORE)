@@ -1,0 +1,54 @@
+# Throwing my deleted Python code into here incase we need something for later. Please ignore this file.
+
+# This is a sample Python script.
+
+# Press ⌃R to execute it or replace it with your code.
+# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+
+
+#import serial
+#import time
+
+#arduino = serial.Serial('COM1', 9600)
+#time.sleep(2)
+
+#print("Enter 1 to turn ON LED and 0 to turn OFF LED")
+
+#while 1;
+#    dataFromUser = input()
+
+#    if dataFromUser == '1':
+#        arduino.write(b'1')
+#        print("LED turned ON")
+#    elif dataFromUser == '0':
+#        arduino.write('0')
+#        print("LED turned OFF")
+
+#def print_hi(name):
+    # Use a breakpoint in the code line below to debug your script.
+#    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+
+
+# Press the green button in the gutter to run the script.
+#if __name__ == '__main__':
+#    print_hi('PyCharm')
+
+import serial
+#import os
+import time
+ser = serial.Serial('/dev/ttyACM1', 9600)
+ser.write('110,')
+
+#import os
+#os.getcwd()
+
+#import time
+file = open('samples.csv')
+while 1:
+   line = file.readline()
+   if not line:
+         break
+   ser.write(line)
+   time.sleep(3)
+
+file.close()
