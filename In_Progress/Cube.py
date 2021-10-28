@@ -1,6 +1,5 @@
 import pygame
 from pygame.locals import *
-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import random
@@ -19,11 +18,13 @@ vertices = (
 class CubeDictionary:
 
     def __init__(self, vertices):  # red, green, blue): # x, y, z, velocity, red, green, blue):
+        """
+        Initializes the CubeDictionary class.
+        """
         self.x = x
         self.y = y
         self.z = z
-        self.showMe = showMe
-
+        self.show_me = show_me
 
 
 class Cube:
@@ -78,14 +79,24 @@ class Cube:
         (0, 1, 1)
     )
 
-    def __init__(self, x, y, z, color, showMe):  # red, green, blue): # x, y, z, velocity, red, green, blue):
+    def __init__(
+            self, x, y, z, color, show_me):  # red, green, blue): # x, y, z, velocity, red, green, blue):
+        """
+        Initializes the Cube class.
+        """
         self.x = x
         self.y = y
         self.z = z
         self.color = color
-        self.showMe = showMe
+        self.show_me = show_me
 
-    def createCube(self):
+    def create_cube(self):
+        """
+        Creates the cubes that will be later plotted.
+
+        This method will be used to plot each cube if the cubes
+        are plotted in sequence as opposed to all at once.
+        """
         glBegin(GL_QUADS)
         # glColor3fv((0, 1, 0)) # sets constant color for block
         for surface in self.surfaces:
@@ -104,11 +115,19 @@ class Cube:
         glBegin(GL_LINES)
         for edge in self.edges:
             for vertex in edge:
+                # x = (0, 0, 0)
+                # glColor3fv(x) #self.colors[4])
                 glColor3fv(self.colors[4])
                 glVertex3fv(self.vertices[vertex])
         glEnd()
 
     def plotCube(self):  # , x, y, z):
+        """
+        Plots a single cube.
+
+        This method will be used if the cubes can be plotted
+        in sequence as opposed to all at once.
+        """
         pygame.init()
         display = (800, 600)
         pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
@@ -125,24 +144,33 @@ class Cube:
                 quit()
         glRotatef(1, 3, 1, 1)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        self.createCube()
+        self.create_cube()
         pygame.display.flip()  # .update() doesn't work here for some reason
         pygame.time.wait(10)
 
-        while self.showMe:
+        while self.show_me:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
             glRotatef(1, 3, 1, 1)
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-            self.createCube()
+            self.create_cube()
             pygame.display.flip()  # .update() doesn't work here for some reason
             pygame.time.wait(10)
 
+    def create_cube_map(self):
+        """
+        Creates and returns a map of cubes
+
+        This cube_map will be sent to the view so all of
+        the cubes are plotted at the same time.
+        """
+        print("socks")
+
 
 colorSend = 0
-Cube(random.randrange(-10, 10), random.randrange(-10, 10), random.randrange(-70, -50),
+Cube(random.randrange(-10, 10), random.randrange(-10, 10), random.randrange(-50, -30),
                                colorSend, True).plotCube()
 # for each in range(20):
 #     if colorSend > 10:
