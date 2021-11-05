@@ -421,8 +421,8 @@ class Config:
         AssertionError
             If the configuration needs to be set after rebooting the IWR6843
         """
-        if self.need_reboot:
-            raise AssertionError("Must restart the board to setup this configuration")
+        #if self.need_reboot:
+        #    raise AssertionError("Must restart the board to setup this configuration")
         cmd = self.get_cmd()
         if cmd:
             # Writing multiple values

@@ -520,3 +520,4 @@ class Reader:
         read_buffer = self.data_port.read(self.data_port.inWaiting())
         if len(read_buffer) > 0:
             return self.parser.parser(read_buffer)
+            
