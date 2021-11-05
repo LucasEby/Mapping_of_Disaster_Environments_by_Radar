@@ -1,0 +1,2 @@
+ python3 -m pprofile -f text --exclude-syspath --exclude importlib --include packet basic_control.py
+ python3 -m memory_profiler --precision 16  mprof run basic_control.py
