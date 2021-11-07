@@ -1,8 +1,8 @@
 # Standard Library Imports
-import struct
-import math
-import binascii
-import codecs
+from struct import unpack
+from math import sqrt, atan
+from binascii import hexlify
+from codecs import decode
 from enum import Enum
 from typing import List, Union
 
@@ -53,22 +53,6 @@ class BytesUtils:
             the parsed integer
         """
         return (data[0] + data[1]*256)
-
-    @classmethod
-    def get_hex(cls, data: bytes) -> bytes:
-        """get_hex retrieve the hex bytes representing a bytes object
-
-        Parameters
-        ----------
-        data : bytes
-            the bytes object
-
-        Returns
-        -------
-        bytes
-            the bytes object converted to hex
-        """
-        return (binascii.hexlify(data[::-1]))
 
     @classmethod
     def check_magic_pattern(cls, data: bytes) -> int:
@@ -128,7 +112,7 @@ class MathUtils:
         float
             the calculated range
         """
-        return math.sqrt((x**2) + (y**2) + (z**2))
+        return sqrt((x**2) + (y**2) + (z**2))
 
     @classmethod
     def get_azimuth(cls, x: float, y: float) -> float:
@@ -147,7 +131,7 @@ class MathUtils:
             the meausred azimuth in degrees
         """
         if y != 0.0:
-            return cls.radians_to_degrees(math.atan(x/y))
+            return cls.radians_to_degrees(atan(x/y))
         else:
             if x < 0.0:
                 return -90.0
@@ -178,7 +162,7 @@ class MathUtils:
             else:
                 return 90.0
         else:
-            return cls.radians_to_degrees(math.atan(z/math.sqrt((x**2)+(y**2))))
+            return cls.radians_to_degrees(atan(z/sqrt((x**2)+(y**2))))
 
 class PacketInfo:
     """PacketInfo stores info on a data packet recieved from the IWR6843
@@ -445,10 +429,10 @@ class PacketHandler:
 
         if tlv_type == 1 and tlv_len < packet_info.packet_length:
             for obj in range(packet_info.number_detected_objects):
-                x = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset:tlv_start + offset+4:1]),'hex'))[0]
-                y = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset+4:tlv_start + offset+8:1]),'hex'))[0]
-                z = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset+8:tlv_start + offset+12:1]),'hex'))[0]
-                v = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset+12:tlv_start + offset+16:1]),'hex'))[0]
+                x = unpack('<f', decode(hexlify(data[tlv_start + offset:tlv_start + offset+4:1]),'hex'))[0]
+                y = unpack('<f', decode(hexlify(data[tlv_start + offset+4:tlv_start + offset+8:1]),'hex'))[0]
+                z = unpack('<f', decode(hexlify(data[tlv_start + offset+8:tlv_start + offset+12:1]),'hex'))[0]
+                v = unpack('<f', decode(hexlify(data[tlv_start + offset+12:tlv_start + offset+16:1]),'hex'))[0]
                 computed_range = MathUtils.get_range(x, y, z)
                 azimuth = MathUtils.get_azimuth(x, y)
                 elev_angle = MathUtils.get_elev_angle(x, y, z)
@@ -484,6 +468,7 @@ class PacketHandler:
         Union[List[DetectedObject], None]
             the list of detected objects if the parser status is a pass, none if the parser status is a fail
         """
+        # TODO: Check for another packet and return that packet as well
         packet_info = cls._parse_packet_info(data)
         status = cls._get_status(data, packet_info)
         if status == ParserStatus.TC_PASS:
@@ -520,4 +505,3 @@ class Reader:
         read_buffer = self.data_port.read(self.data_port.inWaiting())
         if len(read_buffer) > 0:
             return self.parser.parser(read_buffer)
-            

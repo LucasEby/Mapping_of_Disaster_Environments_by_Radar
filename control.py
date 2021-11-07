@@ -2,13 +2,14 @@
 from typing import Union, List, Any
 from time import sleep
 from itertools import compress
+from glob import glob
 
 # Package Imports
-from serial import Serial
+from serial import Serial, SerialException
 from pymeasure.instruments.validators import truncated_range, strict_discrete_set
 
 # Self Imports
-None
+from timer import Timer, TimeOutException
 
 class Utils:
     """Utils are utilities for this file
@@ -41,11 +42,26 @@ class Ports:
     cli_port: Serial
     data_port: Serial
 
-    def __init__(self):
+    def __init__(self, attach_time: float = None):
         """__init__ sets up the ports to communicate with the IWR6843
         """
-        self.cli_port = Serial('/dev/tty.SLAB_USBtoUART', 115200, timeout=0.1)
-        self.data_port = Serial('/dev/tty.SLAB_USBtoUART4', 921600, timeout=0.1)
+        timer = None
+        if attach_time:
+            timer = Timer(attach_time)
+        while True:
+            try:
+                directories = glob("/dev/tty.SLAB_USBtoUART*")
+                if directories:
+                    self.cli_port = Serial('/dev/tty.SLAB_USBtoUART', 115200, timeout=0.1)
+                    self.data_port = Serial(directories[1], 921600, timeout=0.1)
+                    break
+                timer.run()
+            except (SerialException, IndexError):
+                sleep(0.05)
+                continue
+            except TimeOutException:
+                raise TimeOutException(message="Searching for serial ports timed out after " + str(attach_time) + " seconds")
+
         self.cli_port.reset_input_buffer()
         self.cli_port.reset_output_buffer()
         self.cli_port.flushInput()
@@ -80,6 +96,8 @@ class Control:
         # The dictionary of configurations
         self.configs = {}
 
+        # TODO: Fix this configuration section and add ways to sort the dictinoary
+
         # All the configurations
         self.sensor_stop = Config("sensorStop", "", no_value=True)
         self.flush_cfg = Config("flushCfg", "", no_value=True)
@@ -88,7 +106,7 @@ class Control:
         self.adc_cfg = Config("adcCfg", "2 %d", need_reboot=True, validator=strict_discrete_set, values=[1,2])
         self.adc_buf_cfg = Config("adcbufCfg", "%d 0 1 1 1", validator=truncated_range, values=[-1,255], stop_start=True)
         self.profile_cfg = Config("profileCfg", "0 %g %g %g %g 0 0 %g %g %d %d %g %g %g", validator=[truncated_range, truncated_range, truncated_range, truncated_range, truncated_range, truncated_range, truncated_range, truncated_range, truncated_range, truncated_range, truncated_range], values=[[60.0,64.0],[0.0, float("inf")],[0.0, float("inf")],[0.0, float("inf")],[2.220446049250313e-16, float("inf")],[0.0, float("inf")],[0, 256],[0, 65565],[0,3],[0,3],[0.0, float("inf")]], stop_start=True)
-        self.chirp_cfg = Config("chirpCfg", "%d %d 0 0 0 0 0 %d", stop_start=True, n_inputs=2, validator=[truncated_range,truncated_range,truncated_range], values=[[0,1],[0,1],[0,4]])
+        self.chirp_cfg = Config("chirpCfg", "%d %d 0 0 0 0 0 %d", stop_start=True, n_inputs=3, validator=[truncated_range,truncated_range,truncated_range], values=[[0,2],[0,2],[0,4]])
         self.low_power = Config("lowPower", "0 0", need_reboot=True)
         self.frame_cfg = Config("frameCfg", "%d %d %d %d %g 1 %g", validator=[truncated_range, truncated_range, truncated_range, truncated_range, truncated_range, truncated_range], values=[[0, 511], [0, 511], [0, 65535], [0, float("inf")], [0, float("inf")], [0, float("inf")]], stop_start=True)
         self.adv_frame_cfg = Config("advFrameCfg", "%d 0 %d 1 %g", validator=[truncated_range, truncated_range, truncated_range], values=[[0, 65535], [0, 65535], [0, float("inf")]], stop_start=True)
@@ -212,6 +230,12 @@ class Control:
         List[str]
             the lines read from the CLI port
         """
+        #lines = []
+        #for _ in range(10000):
+        #    print(_, flush=True)
+        #    result = self.cli_port.read_until("\n".encode("latin-1"))
+        #    if result:
+        #        lines.append(result)
         lines = self.cli_port.readlines(10000)
         for i, line in enumerate(lines):
             line = line.decode().strip('\r\n')
@@ -258,7 +282,9 @@ class Config:
         self.enabled = self.no_value
         self.n_inputs = n_inputs
         if self.n_inputs > 1:
-            self.prev_values = [None,None]
+            self.prev_values = []
+            for i in range(self.n_inputs):
+                self.prev_values.append(None)
             self.prev_index = 0
 
         if self.input:
