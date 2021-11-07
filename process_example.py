@@ -18,7 +18,7 @@ if __name__ == '__main__':
     reader = Reader(ports)
     controller = Control(config_file_name, ports)
 
-    queue = Queue(10)
+    queue = Queue()
     thread1 = ReadThread(reader, queue)
     thread1.start()
 
@@ -40,24 +40,23 @@ if __name__ == '__main__':
 
     while True:
         try:
-            if queue.full():
-                while not(queue.empty()):
-                    gotten = queue.get(block=True)
-                    for got in gotten:
-                        xs.append(got.x)
-                        ys.append(got.y)
-                        zs.append(got.z)
-                        cs.append(got.snr)
-                    sp._offsets3d = (np.array(xs),np.array(ys),np.array(zs))
-                    cs_array = np.array(cs)
-                    sp.set_array(cs_array)
-                    sp.set_clim(min(cs), np.quantile(cs_array, 0.8))
-                    axis.set_xlim([min(xs), max(xs)])
-                    axis.set_ylim([min(ys), max(ys)])
-                    axis.set_zlim([min(zs), max(zs)])
-                    fig.canvas.draw_idle()
-                    plot.show(block=False)
-                    plot.pause(0.001)
-            plot.pause(1.0)
+            while not(queue.empty()):
+                gotten = queue.get(block=True)
+                for got in gotten:
+                    xs.append(got.x)
+                    ys.append(got.y)
+                    zs.append(got.z)
+                    cs.append(got.snr)
+                sp._offsets3d = (np.array(xs),np.array(ys),np.array(zs))
+                cs_array = np.array(cs)
+                sp.set_array(cs_array)
+                sp.set_clim(min(cs), np.quantile(cs_array, 0.8))
+                axis.set_xlim([min(xs), max(xs)])
+                axis.set_ylim([min(ys), max(ys)])
+                axis.set_zlim([min(zs), max(zs)])
+                fig.canvas.draw_idle()
+                plot.show(block=False)
+                plot.pause(0.01)
+            plot.pause(0.01)
         except Empty:
             pass

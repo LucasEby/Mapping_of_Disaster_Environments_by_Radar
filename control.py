@@ -39,12 +39,24 @@ class Ports:
     """Ports stores the serial ports used to communicate with the IWR6843 chip
     """
 
-    cli_port: Serial
-    data_port: Serial
+    cli_port: Union[str, Serial]
+    data_port: Union[str, Serial]
 
-    def __init__(self, attach_time: float = None):
-        """__init__ sets up the ports to communicate with the IWR6843
-        """
+    def __init__(self, attach_time: float = None, attach_to_ports: bool = True):
+        """__init__ [summary]
+
+        Parameters
+        ----------
+        attach_time : float, optional
+            the time to wait to discover and attach to ports if specified, by default None
+        attach_to_ports : bool, optional
+            if True the class will attach to the found ports, if False the class will return the filepaths of the ports, by default True
+
+        Raises
+        ------
+        TimeOutException
+            if the class times out when searching for ports
+        """        
         timer = None
         if attach_time:
             timer = Timer(attach_time)
@@ -52,24 +64,30 @@ class Ports:
             try:
                 directories = glob("/dev/tty.SLAB_USBtoUART*")
                 if directories:
-                    self.cli_port = Serial('/dev/tty.SLAB_USBtoUART', 115200, timeout=0.1)
-                    self.data_port = Serial(directories[1], 921600, timeout=0.1)
+                    if attach_to_ports:
+                        self.cli_port = Serial('/dev/tty.SLAB_USBtoUART', 115200, timeout=0.1)
+                        self.data_port = Serial(directories[1], 921600, timeout=0.1)
+                    else:
+                        self.cli_port = "/dev/tty.SLAB_USBtoUART"
+                        self.data_port = directories[1]
                     break
-                timer.run()
+                if timer:
+                    timer.run()
             except (SerialException, IndexError):
                 sleep(0.05)
                 continue
             except TimeOutException:
                 raise TimeOutException(message="Searching for serial ports timed out after " + str(attach_time) + " seconds")
 
-        self.cli_port.reset_input_buffer()
-        self.cli_port.reset_output_buffer()
-        self.cli_port.flushInput()
-        self.cli_port.flushOutput()
-        self.data_port.reset_input_buffer()
-        self.data_port.reset_output_buffer()
-        self.data_port.flushInput()
-        self.cli_port.flushOutput()
+        if attach_to_ports:
+            self.cli_port.reset_input_buffer()
+            self.cli_port.reset_output_buffer()
+            self.cli_port.flushInput()
+            self.cli_port.flushOutput()
+            self.data_port.reset_input_buffer()
+            self.data_port.reset_output_buffer()
+            self.data_port.flushInput()
+            self.data_port.flushOutput()
 
 class Control:
     """Control provides an interface to controlling the IWR6843
@@ -85,7 +103,14 @@ class Control:
         ports : Ports
             the ports object storing the ports of the IWR6843
         """
-        self.cli_port = ports.cli_port
+        if isinstance(ports.cli_port, str):
+            self.cli_port = Serial(ports.cli_port, 115200, timeout=0.1)
+            self.cli_port.reset_input_buffer()
+            self.cli_port.reset_output_buffer()
+            self.cli_port.flushInput()
+            self.cli_port.flushOutput()
+        else:
+            self.cli_port = ports.cli_port
         self.init_config_file = init_config_file
         self._setup_configs()
         self._init_configuration(self.init_config_file)
