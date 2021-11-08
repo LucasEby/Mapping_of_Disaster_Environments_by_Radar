@@ -1,0 +1,389 @@
+Total duration: 0.64225s
+File: basic_control.py
+File duration: 0.585428s (91.15%)
+Line #|      Hits|         Time| Time per hit|      %|Source code
+------+----------+-------------+-------------+-------+-----------
+     1|         2|  2.88486e-05|  1.44243e-05|  0.00%|import serial
+(call)|         1|     0.024374|     0.024374|  3.80%|# <frozen importlib._bootstrap>:986 _find_and_load
+     2|         1|  4.05312e-06|  4.05312e-06|  0.00%|import time
+     3|         1|  1.38283e-05|  1.38283e-05|  0.00%|from packet import PacketHandler
+(call)|         1|   0.00561714|   0.00561714|  0.87%|# <frozen importlib._bootstrap>:986 _find_and_load
+     4|         0|            0|            0|  0.00%|
+     5|         1|   3.8147e-06|   3.8147e-06|  0.00%|config_file_name = 'xwr68xx_profile_2021_10_24T03_23_44_468.cfg'
+     6|         0|            0|            0|  0.00%|
+     7|         1|  3.09944e-06|  3.09944e-06|  0.00%|cli_port = None
+     8|         1|  4.05312e-06|  4.05312e-06|  0.00%|data_port = None
+     9|         0|            0|            0|  0.00%|
+    10|         2|  8.34465e-06|  4.17233e-06|  0.00%|def config(config_file='xwr68xx_profile_2021_10_24T03_23_44_468.cfg'):
+    11|         1|  1.66893e-05|  1.66893e-05|  0.00%|    cli_port = serial.Serial('/dev/tty.SLAB_USBtoUART', 115200)
+(call)|         1|    0.0065012|    0.0065012|  1.01%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialutil.py:180 __init__
+    12|         1|  1.66893e-05|  1.66893e-05|  0.00%|    data_port = serial.Serial('/dev/tty.SLAB_USBtoUART4', 921600)
+(call)|         1|   0.00424027|   0.00424027|  0.66%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialutil.py:180 __init__
+    13|         1|  1.19209e-05|  1.19209e-05|  0.00%|    cli_port.reset_input_buffer()
+(call)|         1|  0.000129938|  0.000129938|  0.02%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialposix.py:679 reset_input_buffer
+    14|         1|  1.38283e-05|  1.38283e-05|  0.00%|    cli_port.reset_output_buffer()
+(call)|         1|  9.41753e-05|  9.41753e-05|  0.01%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialposix.py:685 reset_output_buffer
+    15|         1|  1.52588e-05|  1.52588e-05|  0.00%|    data_port.reset_input_buffer()
+(call)|         1|  0.000207901|  0.000207901|  0.03%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialposix.py:679 reset_input_buffer
+    16|         1|  3.29018e-05|  3.29018e-05|  0.01%|    data_port.reset_output_buffer()
+(call)|         1|  0.000183105|  0.000183105|  0.03%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialposix.py:685 reset_output_buffer
+    17|         0|            0|            0|  0.00%|
+    18|         0|            0|            0|  0.00%|    # Read the configuration file and send it to the board
+    19|        55|  0.000282288|   5.1325e-06|  0.04%|    config = [line.rstrip('\r\n') for line in open(config_file)]
+(call)|         1|  4.00543e-05|  4.00543e-05|  0.01%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/_bootlocale.py:33 getpreferredencoding
+(call)|         1|  3.48091e-05|  3.48091e-05|  0.01%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/codecs.py:309 __init__
+(call)|         2|  3.67165e-05|  1.83582e-05|  0.01%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/codecs.py:319 decode
+(call)|         1|  0.000210047|  0.000210047|  0.03%|# basic_control.py:19 <listcomp>
+    20|        53|   0.00303578|  5.72789e-05|  0.47%|    for i in config:
+    21|        52|   0.00163031|   3.1352e-05|  0.25%|        cli_port.write((i+'\n').encode('latin-1'))
+(call)|        52|    0.0149992|  0.000288445|  2.34%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialposix.py:612 write
+    22|        52|   0.00158119|  3.04075e-05|  0.25%|        print(i)
+    23|        52|     0.578637|    0.0111276| 90.10%|        time.sleep(0.01)
+    24|         0|            0|            0|  0.00%|
+    25|         1|  5.24521e-06|  5.24521e-06|  0.00%|    return cli_port, data_port
+    26|         0|            0|            0|  0.00%|
+    27|         1|   3.0756e-05|   3.0756e-05|  0.00%|cli_port, data_port = config()
+(call)|         1|     0.611751|     0.611751| 95.25%|# basic_control.py:10 config
+    28|         0|            0|            0|  0.00%|
+    29|         1|  1.78814e-05|  1.78814e-05|  0.00%|parser = PacketHandler()
+(call)|         1|  1.00136e-05|  1.00136e-05|  0.00%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:124 __init__
+    30|         0|            0|            0|  0.00%|#reads = 1
+    31|         0|            0|            0|  0.00%|#while reads < 1:
+    32|         1|  2.83718e-05|  2.83718e-05|  0.00%|read_buffer = data_port.read(data_port.inWaiting())
+(call)|         1|  5.76973e-05|  5.76973e-05|  0.01%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialutil.py:593 inWaiting
+(call)|         1|   0.00024581|   0.00024581|  0.04%|# /Users/Anuj/Library/Python/3.8/lib/python/site-packages/serial/serialposix.py:553 read
+    33|         1|  6.19888e-06|  6.19888e-06|  0.00%|if len(read_buffer) > 0:
+    34|         0|            0|            0|  0.00%|    print(parser.parser(read_buffer))
+    35|         0|            0|            0|  0.00%|        #ti_packet_parser.parser_one_mmw_demo_output_packet(read_buffer, len(read_buffer))
+File: /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py
+File duration: 0.000680685s (0.11%)
+Line #|      Hits|         Time| Time per hit|      %|Source code
+------+----------+-------------+-------------+-------+-----------
+     1|         2|   2.6226e-05|   1.3113e-05|  0.00%|import struct
+     2|         1|  4.76837e-06|  4.76837e-06|  0.00%|import math
+     3|         1|  9.29832e-06|  9.29832e-06|  0.00%|import binascii
+     4|         1|  7.86781e-06|  7.86781e-06|  0.00%|import codecs
+     5|         1|  1.00136e-05|  1.00136e-05|  0.00%|from enum import Enum
+     6|         1|  1.09673e-05|  1.09673e-05|  0.00%|from typing import Tuple, List, Union
+     7|         0|            0|            0|  0.00%|
+     8|         3|  9.84669e-05|  3.28223e-05|  0.02%|class ParserStatus(Enum):
+(call)|         1|  0.000204086|  0.000204086|  0.03%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/enum.py:119 __prepare__
+(call)|         2|  0.000240564|  0.000120282|  0.04%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/enum.py:64 __setitem__
+(call)|         1|  0.000476837|  0.000476837|  0.07%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:8 ParserStatus
+(call)|         1|   0.00121593|   0.00121593|  0.19%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/enum.py:129 __new__
+     9|         1|  1.00136e-05|  1.00136e-05|  0.00%|    TC_PASS = 0
+(call)|         1|  0.000106096|  0.000106096|  0.02%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/enum.py:64 __setitem__
+    10|         1|  7.62939e-06|  7.62939e-06|  0.00%|    TC_FAIL = 1
+(call)|         1|  7.51019e-05|  7.51019e-05|  0.01%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/enum.py:64 __setitem__
+    11|         0|            0|            0|  0.00%|
+    12|         3|  4.12464e-05|  1.37488e-05|  0.01%|class BytesUtils:
+(call)|         1|  3.98159e-05|  3.98159e-05|  0.01%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:12 BytesUtils
+    13|         1|  2.86102e-06|  2.86102e-06|  0.00%|    @classmethod
+    14|         1|  4.05312e-06|  4.05312e-06|  0.00%|    def get_uint32(cls, data: bytes) -> int:
+    15|         0|            0|            0|  0.00%|        return (data[0] +
+    16|         0|            0|            0|  0.00%|                data[1]*256 +
+    17|         0|            0|            0|  0.00%|                data[2]*65536 +
+    18|         0|            0|            0|  0.00%|                data[3]*16777216)
+    19|         0|            0|            0|  0.00%|
+    20|         1|  4.76837e-06|  4.76837e-06|  0.00%|    @classmethod
+    21|         1|  3.09944e-06|  3.09944e-06|  0.00%|    def get_uint16(cls, data: bytes) -> int:
+    22|         0|            0|            0|  0.00%|        return (data[0] +
+    23|         0|            0|            0|  0.00%|                data[1]*256)
+    24|         0|            0|            0|  0.00%|
+    25|         1|  4.05312e-06|  4.05312e-06|  0.00%|    @classmethod
+    26|         1|  3.09944e-06|  3.09944e-06|  0.00%|    def get_hex(cls, data: bytes) -> bytes:
+    27|         0|            0|            0|  0.00%|        return (binascii.hexlify(data[::-1]))
+    28|         0|            0|            0|  0.00%|
+    29|         1|  2.86102e-06|  2.86102e-06|  0.00%|    @classmethod
+    30|         1|  4.05312e-06|  4.05312e-06|  0.00%|    def check_magic_pattern(cls, data: bytes) -> int:
+    31|         0|            0|            0|  0.00%|        found = 0
+    32|         0|            0|            0|  0.00%|        if (data[0] == 2 and data[1] == 1 and data[2] == 4 and data[3] == 3 and data[4] == 6 and data[5] == 5 and data[6] == 8 and data[7] == 7):
+    33|         0|            0|            0|  0.00%|            found = 1
+    34|         0|            0|            0|  0.00%|        return (found)
+    35|         0|            0|            0|  0.00%|
+    36|         3|  4.31538e-05|  1.43846e-05|  0.01%|class MathUtils:
+(call)|         1|  3.40939e-05|  3.40939e-05|  0.01%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:36 MathUtils
+    37|         1|  3.09944e-06|  3.09944e-06|  0.00%|    @classmethod
+    38|         1|  5.96046e-06|  5.96046e-06|  0.00%|    def get_range(cls, x: float, y: float, z: float) -> float:
+    39|         0|            0|            0|  0.00%|        return math.sqrt((x**2) + (y**2) + (z**2))
+    40|         0|            0|            0|  0.00%|
+    41|         1|  2.86102e-06|  2.86102e-06|  0.00%|    @classmethod
+    42|         1|  4.29153e-06|  4.29153e-06|  0.00%|    def get_azimuth(cls, x: float, y: float) -> float:
+    43|         0|            0|            0|  0.00%|        if y != 0.0:
+    44|         0|            0|            0|  0.00%|            return math.atan(x/y)
+    45|         0|            0|            0|  0.00%|        else:
+    46|         0|            0|            0|  0.00%|            if x < 0.0:
+    47|         0|            0|            0|  0.00%|                return -90.0
+    48|         0|            0|            0|  0.00%|            else:
+    49|         0|            0|            0|  0.00%|                return 90.0
+    50|         0|            0|            0|  0.00%|
+    51|         1|   2.6226e-06|   2.6226e-06|  0.00%|    @classmethod
+    52|         1|  4.29153e-06|  4.29153e-06|  0.00%|    def get_elev_angle(cls, x: float, y: float, z: float) -> float:
+    53|         0|            0|            0|  0.00%|        if x == 0.0 and y == 0.0:
+    54|         0|            0|            0|  0.00%|            if z >= 0.0:
+    55|         0|            0|            0|  0.00%|                return 90.0
+    56|         0|            0|            0|  0.00%|            else:
+    57|         0|            0|            0|  0.00%|                return -90.0
+    58|         0|            0|            0|  0.00%|        else:
+    59|         0|            0|            0|  0.00%|            return math.atan(z/math.sqrt((x*x)+(y*y)))*(180/math.pi)
+    60|         0|            0|            0|  0.00%|
+    61|         0|            0|            0|  0.00%|
+    62|         3|  3.98159e-05|   1.3272e-05|  0.01%|class PacketInfo:
+(call)|         1|  3.69549e-05|  3.69549e-05|  0.01%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:62 PacketInfo
+    63|         1|  3.09944e-06|  3.09944e-06|  0.00%|    header_start_index: int
+    64|         1|  2.86102e-06|  2.86102e-06|  0.00%|    packet_length: int
+    65|         1|  3.09944e-06|  3.09944e-06|  0.00%|    number_detected_objects: int
+    66|         1|  4.05312e-06|  4.05312e-06|  0.00%|    number_tlv: int
+    67|         1|  2.86102e-06|  2.86102e-06|  0.00%|    frame_number: int
+    68|         1|  2.86102e-06|  2.86102e-06|  0.00%|    sub_frame_number: int
+    69|         1|  3.09944e-06|  3.09944e-06|  0.00%|    time_cpu_cylces: int
+    70|         0|            0|            0|  0.00%|
+    71|         2|  9.05991e-06|  4.52995e-06|  0.00%|    def __init__(self, header_start_index: int = -1, packet_length: int = -1, number_detected_objects: int = -1, number_tlv: int = -1, frame_number: int = -1, sub_frame_number: int = -1, time_cpu_cycles: int = -1):
+    72|         1|  2.86102e-06|  2.86102e-06|  0.00%|        self.header_start_index = header_start_index
+    73|         1|  5.00679e-06|  5.00679e-06|  0.00%|        self.packet_length = packet_length
+    74|         1|  3.09944e-06|  3.09944e-06|  0.00%|        self.number_detected_objects = number_detected_objects
+    75|         1|   3.8147e-06|   3.8147e-06|  0.00%|        self.number_tlv = number_tlv
+    76|         1|  3.09944e-06|  3.09944e-06|  0.00%|        self.frame_number = frame_number
+    77|         1|  4.05312e-06|  4.05312e-06|  0.00%|        self.sub_frame_number = sub_frame_number
+    78|         1|  2.86102e-06|  2.86102e-06|  0.00%|        self.time_cpu_cycles = time_cpu_cycles
+    79|         0|            0|            0|  0.00%|
+    80|         3|  4.31538e-05|  1.43846e-05|  0.01%|class DetectedObject:
+(call)|         1|  9.39369e-05|  9.39369e-05|  0.01%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:80 DetectedObject
+    81|         1|  1.90735e-06|  1.90735e-06|  0.00%|    x: float
+    82|         1|  4.05312e-06|  4.05312e-06|  0.00%|    y: float
+    83|         1|  4.05312e-06|  4.05312e-06|  0.00%|    z: float
+    84|         1|  5.00679e-06|  5.00679e-06|  0.00%|    v: float
+    85|         1|  4.05312e-06|  4.05312e-06|  0.00%|    computed_range: float
+    86|         1|   3.8147e-06|   3.8147e-06|  0.00%|    azimuth: float
+    87|         1|  4.05312e-06|  4.05312e-06|  0.00%|    elev_angle: float
+    88|         1|  4.29153e-06|  4.29153e-06|  0.00%|    snr: float
+    89|         1|   3.3617e-05|   3.3617e-05|  0.01%|    noise: float
+    90|         0|            0|            0|  0.00%|
+    91|         1|  5.24521e-06|  5.24521e-06|  0.00%|    def __init__(self, x: float=0.0, y: float=0.0, z: float=0.0, v: float=0.0, range: float=0.0, azimuth: float=0.0, elev_angle: float=0.0, snr: float=0.0, noise: float=0.0):
+    92|         0|            0|            0|  0.00%|        self.x = x
+    93|         0|            0|            0|  0.00%|        self.y = y
+    94|         0|            0|            0|  0.00%|        self.z = z
+    95|         0|            0|            0|  0.00%|        self.v = v
+    96|         0|            0|            0|  0.00%|        self.range = range
+    97|         0|            0|            0|  0.00%|        self.azimuth = azimuth
+    98|         0|            0|            0|  0.00%|        self.elev_angle = elev_angle
+    99|         0|            0|            0|  0.00%|        self.snr = snr
+   100|         0|            0|            0|  0.00%|        self.noise = noise
+   101|         0|            0|            0|  0.00%|
+   102|         1|  4.05312e-06|  4.05312e-06|  0.00%|    def tlv_type_1(self, x: float, y: float, z: float, v: float, computed_range: float, azimuth: float, elev_angle: float) -> None:
+   103|         0|            0|            0|  0.00%|        self.x = x
+   104|         0|            0|            0|  0.00%|        self.y = y
+   105|         0|            0|            0|  0.00%|        self.z = z
+   106|         0|            0|            0|  0.00%|        self.v = v
+   107|         0|            0|            0|  0.00%|        self.computed_range = computed_range
+   108|         0|            0|            0|  0.00%|        self.azimuth = azimuth
+   109|         0|            0|            0|  0.00%|        self.elev_angle = elev_angle
+   110|         0|            0|            0|  0.00%|        return self
+   111|         0|            0|            0|  0.00%|
+   112|         1|   3.8147e-06|   3.8147e-06|  0.00%|    def tlv_type_7(self, snr: float, noise: float) -> None:
+   113|         0|            0|            0|  0.00%|        self.snr = snr
+   114|         0|            0|            0|  0.00%|        self.noise = noise
+   115|         0|            0|            0|  0.00%|        return
+   116|         0|            0|            0|  0.00%|
+   117|         1|  4.05312e-06|  4.05312e-06|  0.00%|    def __repr__(self) -> str:
+   118|         0|            0|            0|  0.00%|        return str(self.__dict__)
+   119|         0|            0|            0|  0.00%|
+   120|         3|  4.81606e-05|  1.60535e-05|  0.01%|class PacketHandler:
+(call)|         1|   0.00132799|   0.00132799|  0.21%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:120 PacketHandler
+   121|         1|   2.6226e-06|   2.6226e-06|  0.00%|    HEADER_BYTE_SIZE: int = 40
+   122|         1|  4.29153e-06|  4.29153e-06|  0.00%|    status: ParserStatus
+   123|         0|            0|            0|  0.00%|
+   124|         2|   1.0252e-05|    5.126e-06|  0.00%|    def __init__(self):
+   125|         1|   3.8147e-06|   3.8147e-06|  0.00%|        pass
+   126|         0|            0|            0|  0.00%|
+   127|         1|  2.86102e-06|  2.86102e-06|  0.00%|    @classmethod
+   128|         1|  5.00679e-06|  5.00679e-06|  0.00%|    def _parse_packet_info(cls, data: bytes) -> PacketInfo:
+   129|         0|            0|            0|  0.00%|        header_start_index = -1
+   130|         0|            0|            0|  0.00%|        num_bytes = len(data)
+   131|         0|            0|            0|  0.00%|
+   132|         0|            0|            0|  0.00%|        for index in range(num_bytes):
+   133|         0|            0|            0|  0.00%|            if BytesUtils.check_magic_pattern(data[index:index+8:1]) == 1:
+   134|         0|            0|            0|  0.00%|                header_start_index = index
+   135|         0|            0|            0|  0.00%|                break
+   136|         0|            0|            0|  0.00%|
+   137|         0|            0|            0|  0.00%|        if header_start_index != -1:
+   138|         0|            0|            0|  0.00%|            packet_length = BytesUtils.get_uint32(
+   139|         0|            0|            0|  0.00%|                data[header_start_index+12:header_start_index+16:1]
+   140|         0|            0|            0|  0.00%|            )
+   141|         0|            0|            0|  0.00%|            frame_number = BytesUtils.get_uint32(
+   142|         0|            0|            0|  0.00%|                data[header_start_index+20:header_start_index+24:1]
+   143|         0|            0|            0|  0.00%|            )
+   144|         0|            0|            0|  0.00%|            time_cpu_cycles = BytesUtils.get_uint32(
+   145|         0|            0|            0|  0.00%|                data[header_start_index+24:header_start_index+28:1]
+   146|         0|            0|            0|  0.00%|            )
+   147|         0|            0|            0|  0.00%|            number_detected_objects = BytesUtils.get_uint32(
+   148|         0|            0|            0|  0.00%|                data[header_start_index+28:header_start_index+32:1]
+   149|         0|            0|            0|  0.00%|            )
+   150|         0|            0|            0|  0.00%|            number_tlv = BytesUtils.get_uint32(
+   151|         0|            0|            0|  0.00%|                data[header_start_index+32:header_start_index+36:1]
+   152|         0|            0|            0|  0.00%|            )
+   153|         0|            0|            0|  0.00%|            sub_frame_number = BytesUtils.get_uint32(
+   154|         0|            0|            0|  0.00%|                data[header_start_index+36:header_start_index+40:1]
+   155|         0|            0|            0|  0.00%|            )
+   156|         0|            0|            0|  0.00%|            return PacketInfo(header_start_index, packet_length, number_detected_objects, number_tlv, frame_number, sub_frame_number, time_cpu_cycles)
+   157|         0|            0|            0|  0.00%|        return PacketInfo()
+   158|         0|            0|            0|  0.00%|
+   159|         1|  4.05312e-06|  4.05312e-06|  0.00%|    @classmethod
+   160|         1|   1.5974e-05|   1.5974e-05|  0.00%|    def _get_status(cls, data: bytes, packet_info: PacketInfo()) -> None:
+(call)|         1|  2.88486e-05|  2.88486e-05|  0.00%|# /Users/Anuj/Documents/Workspace/Capstone/Main/packet.py:71 __init__
+   161|         0|            0|            0|  0.00%|        status = None
+   162|         0|            0|            0|  0.00%|        if packet_info.header_start_index == -1:
+   163|         0|            0|            0|  0.00%|            return ParserStatus.TC_FAIL
+   164|         0|            0|            0|  0.00%|        elif packet_info.number_detected_objects < 0:
+   165|         0|            0|            0|  0.00%|            return ParserStatus.TC_FAIL
+   166|         0|            0|            0|  0.00%|        elif packet_info.sub_frame_number > 3:
+   167|         0|            0|            0|  0.00%|            return ParserStatus.TC_FAIL
+   168|         0|            0|            0|  0.00%|        elif (packet_info.header_start_index + packet_info.packet_length) > len(data):
+   169|         0|            0|            0|  0.00%|            return ParserStatus.TC_FAIL
+   170|         0|            0|            0|  0.00%|        else:
+   171|         0|            0|            0|  0.00%|            next_header_start_index = packet_info.header_start_index + packet_info.packet_length
+   172|         0|            0|            0|  0.00%|            if (next_header_start_index + 8) < packet_info.packet_length and \
+   173|         0|            0|            0|  0.00%|                (BytesUtils.check_magic_pattern(data[next_header_start_index:next_header_start_index+8:1])==0):
+   174|         0|            0|            0|  0.00%|                return ParserStatus.TC_FAIL
+   175|         0|            0|            0|  0.00%|        return ParserStatus.TC_PASS
+   176|         0|            0|            0|  0.00%|
+   177|         1|  4.05312e-06|  4.05312e-06|  0.00%|    @classmethod
+   178|         1|  1.43051e-05|  1.43051e-05|  0.00%|    def _parse_tlvs(cls, data: bytes, packet_info: PacketInfo) -> List[DetectedObject]:
+(call)|         1|  0.000500917|  0.000500917|  0.08%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/typing.py:255 inner
+   179|         0|            0|            0|  0.00%|        detected_objects = []
+   180|         0|            0|            0|  0.00%|        for _ in range(packet_info.number_detected_objects):
+   181|         0|            0|            0|  0.00%|            detected_objects.append(DetectedObject())
+   182|         0|            0|            0|  0.00%|        tlv_start = packet_info.header_start_index + 40
+   183|         0|            0|            0|  0.00%|        tlv_type = BytesUtils.get_uint32(data[(tlv_start+0):(tlv_start+4):1])
+   184|         0|            0|            0|  0.00%|        tlv_len = BytesUtils.get_uint32(data[(tlv_start+4):(tlv_start+8):1])
+   185|         0|            0|            0|  0.00%|        offset = 8
+   186|         0|            0|            0|  0.00%|
+   187|         0|            0|            0|  0.00%|        if tlv_type == 1 and tlv_len < packet_info.packet_length:
+   188|         0|            0|            0|  0.00%|            for obj in range(packet_info.number_detected_objects):
+   189|         0|            0|            0|  0.00%|                x = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset:tlv_start + offset+4:1]),'hex'))[0]
+   190|         0|            0|            0|  0.00%|                y = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset+4:tlv_start + offset+8:1]),'hex'))[0]
+   191|         0|            0|            0|  0.00%|                z = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset+8:tlv_start + offset+12:1]),'hex'))[0]
+   192|         0|            0|            0|  0.00%|                v = struct.unpack('<f', codecs.decode(binascii.hexlify(data[tlv_start + offset+12:tlv_start + offset+16:1]),'hex'))[0]
+   193|         0|            0|            0|  0.00%|                computed_range = MathUtils.get_range(x, y, z)
+   194|         0|            0|            0|  0.00%|                azimuth = MathUtils.get_azimuth(x, y)
+   195|         0|            0|            0|  0.00%|                elev_angle = MathUtils.get_elev_angle(x, y, z)
+   196|         0|            0|            0|  0.00%|
+   197|         0|            0|            0|  0.00%|                detected_objects[obj].tlv_type_1(x, y, z, v, computed_range, azimuth, elev_angle)
+   198|         0|            0|            0|  0.00%|                offset = offset + 16
+   199|         0|            0|            0|  0.00%|
+   200|         0|            0|            0|  0.00%|        tlv_start = tlv_start + 8 + tlv_len
+   201|         0|            0|            0|  0.00%|        tlv_type = BytesUtils.get_uint32(data[tlv_start+0:tlv_start+4:1])
+   202|         0|            0|            0|  0.00%|        tlv_len = BytesUtils.get_uint32(data[tlv_start+4:tlv_start+8:1])
+   203|         0|            0|            0|  0.00%|        offset = 8
+   204|         0|            0|            0|  0.00%|
+   205|         0|            0|            0|  0.00%|        if tlv_type == 7:
+   206|         0|            0|            0|  0.00%|            for obj in range(packet_info.number_detected_objects):
+   207|         0|            0|            0|  0.00%|                snr = BytesUtils.get_uint16(data[tlv_start + offset + 0:tlv_start + offset + 2:1])
+   208|         0|            0|            0|  0.00%|                noise = BytesUtils().get_hex(data[tlv_start + offset + 2:tlv_start + offset + 4:1])
+   209|         0|            0|            0|  0.00%|                detected_objects[obj].tlv_type_7(snr, noise)
+   210|         0|            0|            0|  0.00%|                offset = offset + 4
+   211|         0|            0|            0|  0.00%|
+   212|         0|            0|            0|  0.00%|        return detected_objects
+   213|         0|            0|            0|  0.00%|
+   214|         1|  4.76837e-06|  4.76837e-06|  0.00%|    @classmethod
+   215|         1|  1.81198e-05|  1.81198e-05|  0.00%|    def parser(cls, data: bytes) -> Union[List[DetectedObject], None]:
+(call)|         2|  0.000705957|  0.000352979|  0.11%|# /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/typing.py:255 inner
+   216|         0|            0|            0|  0.00%|        packet_info = cls._parse_packet_info(data)
+   217|         0|            0|            0|  0.00%|        status = cls._get_status(data, packet_info)
+   218|         0|            0|            0|  0.00%|        if status == ParserStatus.TC_PASS:
+   219|         0|            0|            0|  0.00%|            return cls._parse_tlvs(data, packet_info)
+   220|         0|            0|            0|  0.00%|        else:
+   221|         0|            0|            0|  0.00%|            return None
+File: <frozen zipimport>
+File duration: 5.19753e-05s (0.01%)
+Line #|      Hits|         Time| Time per hit|      %|Source code
+------+----------+-------------+-------------+-------+-----------
+     1|         0|            0|            0|  0.00%|
+     2|         0|            0|            0|  0.00%|
+     3|         0|            0|            0|  0.00%|
+     4|         0|            0|            0|  0.00%|
+     5|         0|            0|            0|  0.00%|
+     6|         0|            0|            0|  0.00%|
+     7|         0|            0|            0|  0.00%|
+     8|         0|            0|            0|  0.00%|
+     9|         0|            0|            0|  0.00%|
+    10|         0|            0|            0|  0.00%|
+    11|         0|            0|            0|  0.00%|
+    12|         0|            0|            0|  0.00%|
+    13|         0|            0|            0|  0.00%|
+    14|         0|            0|            0|  0.00%|
+    15|         0|            0|            0|  0.00%|
+    16|         0|            0|            0|  0.00%|
+    17|         0|            0|            0|  0.00%|
+    18|         0|            0|            0|  0.00%|
+    19|         0|            0|            0|  0.00%|
+    20|         0|            0|            0|  0.00%|
+    21|         0|            0|            0|  0.00%|
+    22|         0|            0|            0|  0.00%|
+    23|         0|            0|            0|  0.00%|
+    24|         0|            0|            0|  0.00%|
+    25|         0|            0|            0|  0.00%|
+    26|         0|            0|            0|  0.00%|
+    27|         0|            0|            0|  0.00%|
+    28|         0|            0|            0|  0.00%|
+    29|         0|            0|            0|  0.00%|
+    30|         0|            0|            0|  0.00%|
+    31|         0|            0|            0|  0.00%|
+    32|         0|            0|            0|  0.00%|
+    33|         0|            0|            0|  0.00%|
+    34|         0|            0|            0|  0.00%|
+    35|         0|            0|            0|  0.00%|
+    36|         0|            0|            0|  0.00%|
+    37|         0|            0|            0|  0.00%|
+    38|         0|            0|            0|  0.00%|
+    39|         0|            0|            0|  0.00%|
+    40|         0|            0|            0|  0.00%|
+    41|         0|            0|            0|  0.00%|
+    42|         0|            0|            0|  0.00%|
+    43|         0|            0|            0|  0.00%|
+    44|         0|            0|            0|  0.00%|
+    45|         0|            0|            0|  0.00%|
+    46|         0|            0|            0|  0.00%|
+    47|         0|            0|            0|  0.00%|
+    48|         0|            0|            0|  0.00%|
+    49|         0|            0|            0|  0.00%|
+    50|         0|            0|            0|  0.00%|
+    51|         0|            0|            0|  0.00%|
+    52|         0|            0|            0|  0.00%|
+    53|         0|            0|            0|  0.00%|
+    54|         0|            0|            0|  0.00%|
+    55|         0|            0|            0|  0.00%|
+    56|         0|            0|            0|  0.00%|
+    57|         0|            0|            0|  0.00%|
+    58|         0|            0|            0|  0.00%|
+    59|         0|            0|            0|  0.00%|
+    60|         0|            0|            0|  0.00%|
+    61|         0|            0|            0|  0.00%|
+    62|         0|            0|            0|  0.00%|
+    63|         1|  4.05312e-06|  4.05312e-06|  0.00%|
+    64|         1|  7.86781e-06|  7.86781e-06|  0.00%|
+    65|         0|            0|            0|  0.00%|
+    66|         0|            0|            0|  0.00%|
+    67|         1|  5.24521e-06|  5.24521e-06|  0.00%|
+    68|         0|            0|            0|  0.00%|
+    69|         1|   3.8147e-06|   3.8147e-06|  0.00%|
+    70|         0|            0|            0|  0.00%|
+    71|         0|            0|            0|  0.00%|
+    72|         1|  4.05312e-06|  4.05312e-06|  0.00%|
+    73|         0|            0|            0|  0.00%|
+    74|         1|  4.05312e-06|  4.05312e-06|  0.00%|
+    75|         1|  1.16825e-05|  1.16825e-05|  0.00%|
+(call)|         1|  1.71661e-05|  1.71661e-05|  0.00%|# <frozen importlib._bootstrap_external>:80 _path_stat
+    76|         0|            0|            0|  0.00%|
+    77|         0|            0|            0|  0.00%|
+    78|         0|            0|            0|  0.00%|
+    79|         0|            0|            0|  0.00%|
+    80|         0|            0|            0|  0.00%|
+    81|         0|            0|            0|  0.00%|
+    82|         0|            0|            0|  0.00%|
+    83|         0|            0|            0|  0.00%|
+    84|         0|            0|            0|  0.00%|
+    85|         0|            0|            0|  0.00%|
+    86|         1|  4.05312e-06|  4.05312e-06|  0.00%|
+    87|         0|            0|            0|  0.00%|
+    88|         1|  7.15256e-06|  7.15256e-06|  0.00%|

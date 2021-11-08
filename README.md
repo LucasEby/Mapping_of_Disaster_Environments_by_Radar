@@ -1,2 +1,5 @@
-# Mapping_of_Disaster_Environments_by_Radar
-Capstone project.
+# Mapping Of Disaster Environments by Radar
+
+Repository README
+
+TODO: Make this README actually something that is helpful
