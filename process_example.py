@@ -11,8 +11,8 @@ from control import Ports, Control
 from processes import SerialProcess
 
 if __name__ == '__main__':
-    config_file_name = 'xwr68xx_profile_2021_10_24T03_23_44_468.cfg'
-    queue = Queue()
+    config_file_name = 'xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
+    queue = Queue(100)
     ports = Ports(attach_time=20.0, attach_to_ports=False)
     process = SerialProcess(queue, ports.data_port, 921600, 0.1)
     control = Control(config_file_name, ports)
@@ -54,6 +54,7 @@ if __name__ == '__main__':
             plot.show(block=False)
             plot.pause(0.01)
         plot.pause(0.01)
+
     #while True:
     #    if not(queue.empty()):
     #        print(queue.get())
