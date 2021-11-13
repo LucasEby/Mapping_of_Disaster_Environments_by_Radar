@@ -10,25 +10,19 @@ from OpenGL.GLU import gluPerspective
 # Self Imports
 from cube import Cube
 from cube_list import CubeListCreator
-from control import Ports, Control
-from processes import SerialProcess, ArduinoSerialProcess
+from start import Starter
+from processes import ArduinoSerialProcess
 
 def main():
     # Configuration file
     config_file_name = 'xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
     
     # Setup ports and control
-    ports = Ports(attach_time=20.0, attach_to_ports=False)
-    control = Control(config_file_name, ports)
-    sleep(0.1)
+    starter = Starter(config_file_name)
 
-    # Setup queue and process
-    queue = Queue(10)
-    process = SerialProcess(queue, ports.data_port, 921600, 0.1)
-    process.start()
-    arduino_process = ArduinoSerialProcess("/dev/tty.usbserial-14410", 9600, 0.1)
+    # Start arduino process
+    arduino_process = ArduinoSerialProcess("/dev/tty.usbserial-1420", 9600, 0.1)
     arduino_process.start()
-    
     
     # Setup pygame and cubes
     pygame.init()
@@ -44,14 +38,17 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        while not(queue.empty()):
-            gotten = queue.get()
+        while not(starter.queue.empty()):
+            gotten = starter.queue.get()
             for got in gotten:
                 cube = Cube(got.x, got.z, -got.y-10)
                 obj.appendToList(cube)
             del gotten
         obj.plotCubes()
         pygame.time.wait(100)
+        if not(starter.process.is_alive()):
+            del starter
+            starter = Starter(config_file_name)
 
 if __name__ == '__main__':
     main()
