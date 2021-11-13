@@ -3,10 +3,11 @@ from multiprocessing import Process, Queue
 from time import sleep
 
 # Package Imports
-from serial import Serial
+from serial import Serial, SerialException
 
 # Self Imports
 from data import PacketHandler
+from control import Ports
 
 class SerialProcess(Process):
     """SerialProcess represents a process to handle reading from a serial port in another process
@@ -45,7 +46,11 @@ class SerialProcess(Process):
         """        
         self.serial = Serial(serial_port, baudrate=baudrate, timeout=timeout)
         while True:
-            read_buffer = self.serial.read(self.serial.inWaiting())
+            read_buffer = []
+            try:
+                read_buffer = self.serial.read(self.serial.inWaiting())
+            except (SerialException, OSError):
+                break
             if len(read_buffer) > 0:
                 parsed = self.parser.parser(read_buffer)
                 if parsed:

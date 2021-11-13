@@ -36,7 +36,10 @@ class BytesUtils:
         int
             the parsed integer
         """
-        return (data[0] + data[1]*256 + data[2]*65536 + data[3]*16777216)
+        try:
+            return (data[0] + data[1]*256 + data[2]*65536 + data[3]*16777216)
+        except IndexError:
+            return None
 
     @classmethod
     def get_uint16(cls, data: bytes) -> int:
@@ -52,7 +55,10 @@ class BytesUtils:
         int
             the parsed integer
         """
-        return (data[0] + data[1]*256)
+        try:
+            return (data[0] + data[1]*256)
+        except IndexError:
+            return None
 
     @classmethod
     def check_magic_pattern(cls, data: bytes) -> int:
@@ -386,20 +392,22 @@ class PacketHandler:
         ParserStatus
             the status of the parsed packet
         """
-
-        if packet_info.header_start_index == -1:
-            return ParserStatus.TC_FAIL
-        elif packet_info.number_detected_objects < 0:
-            return ParserStatus.TC_FAIL
-        elif packet_info.sub_frame_number > 3:
-            return ParserStatus.TC_FAIL
-        elif (packet_info.header_start_index + packet_info.packet_length) > len(data):
-            return ParserStatus.TC_FAIL
-        else:
-            next_header_start_index = packet_info.header_start_index + packet_info.packet_length
-            if (next_header_start_index + 8) < packet_info.packet_length and \
-                    (BytesUtils.check_magic_pattern(data[next_header_start_index:next_header_start_index+8:1]) == 0):
+        try:
+            if packet_info.header_start_index == -1:
                 return ParserStatus.TC_FAIL
+            elif packet_info.number_detected_objects < 0:
+                return ParserStatus.TC_FAIL
+            elif packet_info.sub_frame_number > 3:
+                return ParserStatus.TC_FAIL
+            elif (packet_info.header_start_index + packet_info.packet_length) > len(data):
+                return ParserStatus.TC_FAIL
+            else:
+                next_header_start_index = packet_info.header_start_index + packet_info.packet_length
+                if (next_header_start_index + 8) < packet_info.packet_length and \
+                        (BytesUtils.check_magic_pattern(data[next_header_start_index:next_header_start_index+8:1]) == 0):
+                    return ParserStatus.TC_FAIL
+        except TypeError:
+            return ParserStatus.TC_FAIL
         return ParserStatus.TC_PASS
 
     @classmethod
@@ -440,10 +448,14 @@ class PacketHandler:
                 detected_objects[obj].tlv_type_1(x, y, z, v, computed_range, azimuth, elev_angle)
                 offset = offset + 16
 
-        tlv_start = tlv_start + 8 + tlv_len
-        tlv_type = BytesUtils.get_uint32(data[tlv_start+0:tlv_start+4:1])
-        tlv_len = BytesUtils.get_uint32(data[tlv_start+4:tlv_start+8:1])
-        offset = 8
+        try:
+            tlv_start = tlv_start + 8 + tlv_len
+            tlv_type = BytesUtils.get_uint32(data[tlv_start+0:tlv_start+4:1])
+            tlv_len = BytesUtils.get_uint32(data[tlv_start+4:tlv_start+8:1])
+            offset = 8
+        except TypeError:
+
+            tlv_type = None
 
         if tlv_type == 7:
             for obj in range(packet_info.number_detected_objects):
@@ -472,9 +484,10 @@ class PacketHandler:
         packet_info = cls._parse_packet_info(data)
         status = cls._get_status(data, packet_info)
         if status == ParserStatus.TC_PASS:
-            return cls._parse_tlvs(data, packet_info)
-        else:
-            return None
+            detected_objects = cls._parse_tlvs(data, packet_info)
+            if len(detected_objects) > 0:
+                return detected_objects
+        return None
 
 class Reader:
     """Reader reads from the data port of the IWR6843

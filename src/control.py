@@ -255,12 +255,6 @@ class Control:
         List[str]
             the lines read from the CLI port
         """
-        #lines = []
-        #for _ in range(10000):
-        #    print(_, flush=True)
-        #    result = self.cli_port.read_until("\n".encode("latin-1"))
-        #    if result:
-        #        lines.append(result)
         lines = self.cli_port.readlines(10000)
         for i, line in enumerate(lines):
             line = line.decode().strip('\r\n')
