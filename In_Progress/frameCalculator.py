@@ -10,6 +10,11 @@ class FrameCalculator:
         self.__y_off = 2
 
     def b_to_d_rotation(self, x_recv, y_recv, z_recv, h_servo, v_servo) -> [float, float, float]:
+        # v_servo origin is 180 degrees
+        # h_servo origin is 115 degrees.
+        h_servo = h_servo - 115
+        v_servo = -(v_servo - 180)
+
         rotated_x = x_recv * math.cos(h_servo) + math.sin(h_servo) * math.cos(v_servo) * (self.__y_off - y_recv) \
                     + math.sin(h_servo) * math.sin(v_servo) * z_recv
         rotated_y = (y_recv - self.__y_off) * math.sin(v_servo) + z_recv * math.cos(v_servo)
