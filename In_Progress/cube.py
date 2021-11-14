@@ -1,9 +1,6 @@
 # from In_Progress.cubeListCreator import CubeListCreator
-from modifying_cube_code.cubeComponents import CubeComponents
-import pygame
-from pygame.locals import *
-from OpenGL.GL import *
-from OpenGL.GLU import *
+from In_Progress.cubeComponents import CubeComponents
+from OpenGL.GL import glBegin, GL_QUADS, glColor3fv, glVertex, glEnd, GL_LINES, glVertex3fv
 
 
 class Cube:
@@ -49,5 +46,12 @@ class Cube:
                 # glColor3fv((0, 1, 0)) #sets vertex color
                 glVertex(new_vertices[vertex])
 
+        glEnd()
+
+        glBegin(GL_LINES)
+        glColor3fv(CubeComponents.colors[4])
+        for edge in CubeComponents.edges:
+            for vertex in edge:
+                glVertex3fv(new_vertices[vertex])
         glEnd()
 
