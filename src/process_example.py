@@ -8,9 +8,11 @@ import matplotlib.pyplot as plot
 
 # Self Imports
 from start import Starter
+from data import MathUtils
 
 def main():
     config_file_name = 'xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
+    #config_file_name = "/Users/Anuj/Downloads/profile_2021_11_14T22_55_38_411.cfg"
     starter = Starter(config_file_name)
     
     fig = plot.figure()
@@ -30,13 +32,20 @@ def main():
     fig.colorbar(sp, label="SNR")
 
     while True:
-        while not(starter.queue.empty()):
-            gotten = starter.queue.get(block=True)
+        while not(starter.objects_queue.empty()):
+            h = 0
+            v = 0
+            if not(starter.angles_queue.empty()):
+                hv = starter.angles_queue.get()
+                h = hv[0]
+                v = hv[1]
+            gotten = starter.objects_queue.get()
             for got in gotten:
                 if got.x and got.y and got.z and got.snr:
-                    xs.append(got.x)
-                    ys.append(got.y)
-                    zs.append(got.z)
+                    x, y, z = MathUtils.b_to_d_rotation(got.x, got.y, got.z, h, v)
+                    xs.append(x)
+                    ys.append(y)
+                    zs.append(z)
                     cs.append(got.snr)
             sp._offsets3d = (np.array(xs),np.array(ys),np.array(zs))
             cs_array = np.array(cs)
@@ -50,7 +59,7 @@ def main():
             plot.pause(0.01)
             del gotten
         plot.pause(0.01)
-        if not(starter.process.is_alive()):
+        if not(starter.iwr6843_process.is_alive()) or not(starter.arduino_process.is_alive()):
             del starter
             starter = Starter(config_file_name)
 

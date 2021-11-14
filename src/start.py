@@ -7,7 +7,7 @@ None
 
 # Self Imports
 from control import Ports, Control
-from processes import SerialProcess
+from processes import IWR6843ReadProcess, ArduinoReadProcess
 
 class Starter:
     """Starter starts and initializes any processes and objects for controlling and communicating with the IWR6843
@@ -28,9 +28,12 @@ class Starter:
             the size of the queue from reading from the serial port, by default 100
         """
         self.config_file_name = config_file_name
-        self.queue = Queue(100)
+        self.objects_queue = Queue(10)
+        self.angles_queue = Queue(1)
         self.ports = Ports(attach_time=20.0, attach_to_ports=False)
-        self.process = SerialProcess(self.queue, self.ports.data_port, 921600, 0.1)
+        self.iwr6843_process = IWR6843ReadProcess(self.objects_queue, self.ports.data_port, 921600, 0.1)
+        self.arduino_process = ArduinoReadProcess(self.angles_queue, self.ports.arduino_port, 9600, 0.1)
         self.control = Control(self.config_file_name, self.ports)
         sleep(0.1)
-        self.process.start()        
+        self.iwr6843_process.start()       
+        self.arduino_process.start() 

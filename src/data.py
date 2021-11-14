@@ -1,10 +1,10 @@
 # Standard Library Imports
 from struct import unpack
-from math import sqrt, atan
+from math import sqrt, atan, cos, sin
 from binascii import hexlify
 from codecs import decode
 from enum import Enum
-from typing import List, Union
+from typing import List, Union, Tuple
 
 # Package Imports
 from serial import Serial
@@ -83,7 +83,8 @@ class MathUtils:
     """MathUtils are utiliites for performing calculations on recieved data
     """
     ONEHUNDRENDEIGHTYOVERPI = 57.2957795131
-
+    Y_OFF = 2
+        
     @classmethod
     def radians_to_degrees(cls, angle: float) -> float:
         """radians_to_degrees convert an angle from radians to degrees
@@ -169,6 +170,24 @@ class MathUtils:
                 return 90.0
         else:
             return cls.radians_to_degrees(atan(z/sqrt((x**2)+(y**2))))
+
+    @classmethod
+    def b_to_d_rotation(cls, x: float, y: float, z: float, h: int, v: int) -> Tuple[float, float, float]:
+        #h = h - 115
+        #v = -(v - 180)
+        rotated_x = \
+            (x * cos(h)) + \
+            (sin(h) * cos(v) * (cls.Y_OFF - y)) + \
+            (sin(h) * sin(v) * z)
+        rotated_y = \
+            ((y - cls.Y_OFF) * sin(v)) +\
+            (z * cos(v))
+        rotated_z = \
+            (-x * sin(h)) + \
+            ((cls.Y_OFF - y) * cos(h) * cos(v)) + \
+            (z * cos(h) * sin(v))
+        return rotated_x, rotated_y, rotated_z
+
 
 class PacketInfo:
     """PacketInfo stores info on a data packet recieved from the IWR6843
