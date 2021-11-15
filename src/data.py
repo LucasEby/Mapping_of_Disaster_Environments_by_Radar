@@ -82,9 +82,12 @@ class BytesUtils:
 class MathUtils:
     """MathUtils are utiliites for performing calculations on recieved data
     """
+    # One hundred eighty over pi for radian to degrese conversion
     ONEHUNDRENDEIGHTYOVERPI = 57.2957795131
+
+    # Offest for Y-axis rotation
     Y_OFF = 2
-        
+
     @classmethod
     def radians_to_degrees(cls, angle: float) -> float:
         """radians_to_degrees convert an angle from radians to degrees
@@ -173,8 +176,8 @@ class MathUtils:
 
     @classmethod
     def b_to_d_rotation(cls, x: float, y: float, z: float, h: int, v: int) -> Tuple[float, float, float]:
-        #h = h - 115
-        #v = -(v - 180)
+        # h = h - 115
+        # v = -(v - 180)
         rotated_x = \
             (x * cos(h)) + \
             (sin(h) * cos(v) * (cls.Y_OFF - y)) + \
@@ -187,7 +190,6 @@ class MathUtils:
             ((cls.Y_OFF - y) * cos(h) * cos(v)) + \
             (z * cos(h) * sin(v))
         return rotated_x, rotated_y, rotated_z
-
 
 class PacketInfo:
     """PacketInfo stores info on a data packet recieved from the IWR6843
@@ -340,12 +342,129 @@ class DetectedObject:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
+class DetectedObjectVoxel(DetectedObject):
+    """DetectedObjectVoxel DetectedObjectVoxel stores info on a detected object parsed from a packet from the IWR6843 as well as functioning as a voxel
+    """
+    def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, v: float = 0.0, computed_range: float = 0.0, azimuth: float = 0.0, elev_angle: float = 0.0, snr: float = 0.0, noise: float = 0.0, resolution: float = 0.25):
+        """__init__ initialize this object
+
+        Parameters
+        ----------
+        x : float, optional
+            the measured x coordinate of the object, by default 0.0
+        y : float, optional
+            the measured y coordinate of the object, by default 0.0
+        z : float, optional
+            the measured z coordinate of the object, by default 0.0
+        v : float, optional
+            the measured velocity of the object, by default 0.0
+        range : float, optional
+            the measured range of the object, by default 0.0
+        azimuth : float, optional
+            the measured azimuth angle of the object, by default 0.0
+        elev_angle : float, optional
+            the measured elevation angle of the object, by default 0.0
+        snr : float, optional
+            the measured signal to noise ratio of the object, by default 0.0
+        noise : float, optional
+            the measured noise of the object, by default 0.0
+        """
+        super(DetectedObjectVoxel, self).__init__(x,y,z,v,computed_range,azimuth,elev_angle,snr,noise)
+        self.resolution = resolution
+        self.x = self._round_pos_to_res(self.x)
+        self.y = self._round_pos_to_res(self.y)
+        self.z = self._round_pos_to_res(self.z)
+
+    def _round_pos_to_res(self, pos: float) -> float:
+        """_round_pos_to_res rounds a passed in position to the nearest interval of resolution used for the voxel
+
+        Parameters
+        ----------
+        pos : float
+            the position that is passed in
+
+        Returns
+        -------
+        float
+            the position rounded to the nearest interval of the resolution
+        """
+        return round(pos/self.resolution)*self.resolution
+
+    def _round_pos(self, pos: float) -> int:
+        """_round_pos rounds a passed in position by dividing the position by the resolution used for
+        the voxel so that hashing can occur on the position.
+
+        In order to properly hash this class for using a hash table, the positions need to be represented as
+        integers, as hashing does not typically occur on floating numbers.
+        Since the program relies upon rounding to the resolution used for the voxels, this function allows
+        the integers to be rounded towards an integer by dividing the position by the resolution, which
+        always results in a whole number.
+
+        Parameters
+        ----------
+        pos : float
+            the position that is passed in
+
+        Returns
+        -------
+        int
+            the position rounded to an integer by the division of the resolution
+        """
+        return int(pos/self.resolution)
+
+    def __hash__(self) -> int:
+        """__hash__ generates a hash for this voxel for a hash table
+
+        A hash is needed so that a hash table can be used efficiently to compare and iterate through different voxels.
+        Only the x, y, and z positions are used for hashing.
+
+        Returns
+        -------
+        int
+            the hash of this voxel
+        """
+        # Hashing function from here: https://dmauro.com/post/77011214305/a-hashing-function-for-x-y-z-coordinates
+        x = self._round_pos(self.x)
+        y = self._round_pos(self.y)
+        z = self._round_pos(self.z)
+        x = 2*x if x >= 0 else -2*x - 1
+        y = 2*y if y >= 0 else -2*y - 1
+        z = 2*z if z >= 0 else -2*z - 1
+        maximum = max([x, y, z])
+        hash = pow(maximum, 3) + (2 * maximum * z) + z
+        if (maximum == z):
+            hash += pow(max([x, y]), 2)
+        if (y >= x):
+            hash += x + y
+        else:
+            hash += y
+        return hash
+
+    def __eq__(self, other: object) -> bool:
+        """__eq__ compare this object to another object
+
+        Parameters
+        ----------
+        other : object
+            the other object
+
+        Returns
+        -------
+        bool
+            False if the other object is not an instance of this object, True if the hashes of the other object and this object are equal
+        """
+        if isinstance(other, DetectedObjectVoxel):
+            return other.__hash__() == self.__hash__()
+        else:
+            return False
+
 class PacketHandler:
     """PacketHandler handles and parses a packet from the IWR6843
     """
 
     # The byte size of a header
     HEADER_BYTE_SIZE: int = 40
+    OBJECT = DetectedObjectVoxel
 
     def __init__(self):
         pass
@@ -448,7 +567,7 @@ class PacketHandler:
 
         detected_objects = []
         for _ in range(packet_info.number_detected_objects):
-            detected_objects.append(DetectedObject())
+            detected_objects.append(cls.OBJECT())
         tlv_start = packet_info.header_start_index + 40
         tlv_type = BytesUtils.get_uint32(data[(tlv_start+0):(tlv_start+4):1])
         tlv_len = BytesUtils.get_uint32(data[(tlv_start+4):(tlv_start+8):1])

@@ -8,11 +8,10 @@ from serial import Serial, SerialException
 
 # Self Imports
 from data import PacketHandler
-from control import Ports
 
 class IWR6843ReadProcess(Process):
     """SerialProcess represents a process to handle reading from the IWR6843 serial data port in another process
-    """    
+    """
     def __init__(self, queue: Queue, serial_port: str, baudrate: int, timeout: float):
         """__init__ sets up the data for the serial process
 
@@ -26,7 +25,7 @@ class IWR6843ReadProcess(Process):
             the baud rate of the serial port
         timeout : float
             the timeout to add to the serial port
-        """        
+        """
         super(IWR6843ReadProcess, self).__init__(target=self.read_serial, args=(serial_port, baudrate, timeout))
         self.queue = queue
         self.serial = None
@@ -44,7 +43,7 @@ class IWR6843ReadProcess(Process):
             the baud rate of the serial port
         timeout : float
             the timeout to add to the serial port
-        """        
+        """
         self.serial = Serial(serial_port, baudrate=baudrate, timeout=timeout)
         while True:
             read_buffer = []
@@ -53,7 +52,6 @@ class IWR6843ReadProcess(Process):
             except (SerialException, OSError, error):
                 break
             if len(read_buffer) > 0:
-                #print("parsing")
                 parsed = self.parser.parser(read_buffer)
                 if parsed:
                     self.queue.put(parsed)
@@ -61,7 +59,7 @@ class IWR6843ReadProcess(Process):
 
 class ArduinoReadProcess(Process):
     """ArduinoReadProcess represents a process to handle reading from the arduino serial port in another process
-    """    
+    """
     def __init__(self, queue: Queue, serial_port: str, baudrate: int, timeout: float):
         """__init__ sets up the data for the serial process
 
@@ -73,7 +71,7 @@ class ArduinoReadProcess(Process):
             the baud rate of the serial port
         timeout : float
             the timeout to add to the serial port
-        """        
+        """
         super(ArduinoReadProcess, self).__init__(target=self.read_serial, args=(serial_port, baudrate, timeout))
         self.queue = queue
         self.serial = None
@@ -90,7 +88,7 @@ class ArduinoReadProcess(Process):
             the baud rate of the serial port
         timeout : float
             the timeout to add to the serial port
-        """        
+        """
         self.serial = Serial(serial_port, baudrate=baudrate, timeout=timeout)
         while True:
             read_buffer = []

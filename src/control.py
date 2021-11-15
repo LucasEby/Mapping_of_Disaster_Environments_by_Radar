@@ -2,7 +2,6 @@
 from typing import Union, List, Any
 from time import sleep
 from itertools import compress
-from glob import glob
 
 # Package Imports
 from serial import Serial, SerialException
@@ -40,8 +39,8 @@ class Ports:
     """Ports stores the serial ports used to communicate with the IWR6843 chip
     """
 
-    #SERIAL_CODE = "SER=00CF6C84"
-    #SERIAL_CODE = "SER=00CF6AE9"  
+    # SERIAL_CODE = "SER=00CF6C84"
+    # SERIAL_CODE = "SER=00CF6AE9"
     SERIAL_CODE = "SER=00CF6"
     cli_port: Union[str, Serial]
     data_port: Union[str, Serial]
@@ -61,7 +60,7 @@ class Ports:
         ------
         TimeOutException
             if the class times out when searching for ports
-        """    
+        """
         # Set objects meant to be global
         timer = None
         cli_path = None
@@ -204,8 +203,8 @@ class Control:
         self.configs[self.chirp_cfg] = self.chirp_cfg
         self.configs[self.frame_cfg] = self.frame_cfg
         self.configs[self.low_power] = self.low_power
-        #self.configs[self.adv_frame_cfg] = self.adv_frame_cfg
-        #self.configs[self.sub_frame_cfg] = self.sub_frame_cfg
+        # self.configs[self.adv_frame_cfg] = self.adv_frame_cfg
+        # self.configs[self.sub_frame_cfg] = self.sub_frame_cfg
         self.configs[self.gui_monitor] = self.gui_monitor
         self.configs[self.cfar_cfg] = self.cfar_cfg
         self.configs[self.multi_obj_beam_forming] = self.multi_obj_beam_forming
@@ -222,8 +221,8 @@ class Control:
         self.configs[self.aoa_fov_cfg] = self.aoa_fov_cfg
         self.configs[self.cfar_fov_cfg] = self.cfar_fov_cfg
         self.configs[self.calib_data] = self.calib_data
-        #self.configs[self.config_data_port] = self.config_data_port
-        #self.configs[self.query_demo_status] = self.query_demo_status
+        # self.configs[self.config_data_port] = self.config_data_port
+        # self.configs[self.query_demo_status] = self.query_demo_status
         self.configs[self.sensor_start] = self.sensor_start
 
     def _init_configuration(self, init_config_file: str) -> None:
@@ -503,7 +502,7 @@ class Config:
         AssertionError
             If the configuration needs to be set after rebooting the IWR6843
         """
-        #if self.need_reboot:
+        # if self.need_reboot:
         #    raise AssertionError("Must restart the board to setup this configuration")
         cmd = self.get_cmd()
         if cmd:
