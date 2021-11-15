@@ -72,6 +72,9 @@ def main():
     # Init plotter
     plotter = Plotter()
 
+    # Dictionary of voxels
+    voxels_dict = {}
+
     # Define signal handler locally
     def signal_handler(sig, frame):
         if sig == signal.SIGQUIT:
@@ -83,9 +86,6 @@ def main():
     # Start signal handler
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
-
-    # Dictinonary of voxels
-    voxels_dict = {}
 
     # Main loop
     while True:

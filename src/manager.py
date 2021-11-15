@@ -43,7 +43,7 @@ class Manager:
         """reset resets the manager, and restarts any processes, port finders, or controllers
         """
         self.yeet(yeet_queue=False)
-        self.ports = Ports(attach_time=self.port_attach_time, attach_to_ports=False)
+        self.ports = Ports(attach_time=self.port_attach_time, attach_to_ports=False, find_arduino=self.run_arduino_process)
         self.iwr6843_process = IWR6843ReadProcess(self.objects_queue, self.ports.data_port, 921600, 0.1)
         if self.run_arduino_process:
             self.arduino_process = ArduinoReadProcess(self.angles_queue, self.ports.arduino_port, 9600, 0.1)
@@ -125,9 +125,15 @@ class Manager:
                     del self.arduino_process
         except AttributeError:
             pass
-        del self.ports
-        del self.control
-        if yeet_queue:
-            del self.objects_queue
-            if self.run_arduino_process:
-                del self.angles_queue
+        try:
+            del self.ports
+            del self.control
+        except AttributeError:
+            pass
+        try:
+            if yeet_queue:
+                del self.objects_queue
+                if self.run_arduino_process:
+                    del self.angles_queue
+        except AttributeError:
+            pass

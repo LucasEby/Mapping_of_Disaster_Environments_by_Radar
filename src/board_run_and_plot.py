@@ -13,14 +13,18 @@ from main import Plotter
 def main():
     # Init manager
     config_file_name = '../data/xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
-    manager = Manager(config_file_name)
+    manager = Manager(config_file_name, run_arduino_process=False)
 
     # Init plotter
     plotter = Plotter()
 
+    # Dictinonary of voxels
+    voxels_dict = {}
+
     # Define signal handler locally
     def signal_handler(sig, frame):
         if sig == signal.SIGQUIT:
+            print(voxels_dict)
             manager.yeet()
             exit(0)
         elif sig == signal.SIGINT:
@@ -29,9 +33,6 @@ def main():
     # Start signal handler
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
-
-    # Dictinonary of voxels
-    voxels_dict = {}
 
     # Main loop
     while True:

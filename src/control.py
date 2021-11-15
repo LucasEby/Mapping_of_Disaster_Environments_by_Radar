@@ -46,7 +46,7 @@ class Ports:
     data_port: Union[str, Serial]
     arduino_port: Union[str, Serial]
 
-    def __init__(self, attach_time: float = None, attach_to_ports: bool = True):
+    def __init__(self, attach_time: float = None, attach_to_ports: bool = True, find_arduino: bool = True):
         """__init__ [summary]
 
         Parameters
@@ -55,6 +55,8 @@ class Ports:
             the time to wait to discover and attach to ports if specified, by default None
         attach_to_ports : bool, optional
             if True the class will attach to the found ports, if False the class will return the filepaths of the ports, by default True
+        find_arduino : bool, optional
+            if True the class will find the arduino, if False it will not find the arduino
 
         Raises
         ------
@@ -91,7 +93,7 @@ class Ports:
                 if timer:
                     timer.run()
                 # Set class data
-                if not(cli_path is None) and not(data_path is None) and not(arduino_path is None):
+                if not(cli_path is None) and not(data_path is None) and (not(arduino_path is None) or not(find_arduino)):
                     # Attach to ports
                     if attach_to_ports:
                         self.cli_port = Serial(cli_path, 115200, timeout=0.1)
