@@ -53,6 +53,7 @@ class IWR6843ReadProcess(Process):
             except (SerialException, OSError, error):
                 break
             if len(read_buffer) > 0:
+                #print("parsing")
                 parsed = self.parser.parser(read_buffer)
                 if parsed:
                     self.queue.put(parsed)
@@ -84,7 +85,7 @@ class ArduinoReadProcess(Process):
         Parameters
         ----------
         serial_port : str
-            [description]
+            the serial port to connect to
         baudrate : int
             the baud rate of the serial port
         timeout : float
@@ -102,7 +103,7 @@ class ArduinoReadProcess(Process):
                 read_buffer = read_buffer.split(",")
                 try:
                     hv_values = (int(read_buffer[0]),int(read_buffer[1]))
-                    self.queue.put(hv_values,block=True)
+                    self.queue.put(hv_values)
                 except (IndexError):
                     break
             sleep(0.01)

@@ -1,67 +1,82 @@
 # Standard Library Imports
 from multiprocessing import Queue
 from time import sleep
+import signal             
+from sys import exit       
 
 # Package Imports
 import numpy as np
 import matplotlib.pyplot as plot
 
 # Self Imports
-from start import Starter
+from manager import Manager
 from data import MathUtils
 
+class Plotter:
+    def __init__(self):
+        self.fig = plot.figure()
+        self.axis = self.fig.add_subplot(projection='3d')
+        self.xs = [0.0]
+        self.ys = [0.0]
+        self.zs = [0.0]
+        self.cs = [0.0]
+        self.sp = self.axis.scatter(np.array(self.xs),np.array(self.ys),np.array(self.zs),np.array(self.cs))
+        plot.ion()
+        plot.pause(0.01)
+        plot.show()
+        self.axis.set_xlabel("X Position (m)")
+        self.axis.set_ylabel("Y Position (m)")
+        self.axis.set_zlabel("Z Position (m)")
+        self.fig.colorbar(self.sp, label="SNR")
+
+    def draw(self):
+        self.sp._offsets3d = (np.array(self.xs),np.array(self.ys),np.array(self.zs))
+        cs_array = np.array(self.cs)
+        self.sp.set_array(cs_array)
+        self.sp.set_clim(min(self.cs), np.quantile(cs_array, 0.8))
+        self.axis.set_xlim([min(self.xs), max(self.xs)])
+        self.axis.set_ylim([min(self.ys), max(self.ys)])
+        self.axis.set_zlim([min(self.zs), max(self.zs)])
+        self.fig.canvas.draw_idle()
+
 def main():
+    # Init manager
     config_file_name = 'xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
-    #config_file_name = "/Users/Anuj/Downloads/profile_2021_11_14T22_55_38_411.cfg"
-    starter = Starter(config_file_name)
+    manager = Manager(config_file_name)
     
-    fig = plot.figure()
-    axis = fig.add_subplot(projection='3d')
-    xs = [0.0]
-    ys = [0.0]
-    zs = [0.0]
-    cs = [0.0]
-    sp = axis.scatter(np.array(xs),np.array(ys),np.array(zs),np.array(cs))
-    plot.ion()
-    plot.pause(0.01)
-    plot.show()
-    axis.set_xlabel("X Position (m)")
-    axis.set_ylabel("Y Position (m)")
-    axis.set_zlabel("Z Position (m)")
+    # Init plotter
+    plotter = Plotter()
 
-    fig.colorbar(sp, label="SNR")
+    # Define signal handler locally
+    def signal_handler(sig, frame):
+        manager.yeet()
+        exit(0)
 
+    # Start signal handler
+    signal.signal(signal.SIGINT, signal_handler)
+
+    # Main loop
     while True:
-        while not(starter.objects_queue.empty()):
+        while not(manager.detected_objects_is_empty()):
             h = 0
             v = 0
-            if not(starter.angles_queue.empty()):
-                hv = starter.angles_queue.get()
-                h = hv[0]
-                v = hv[1]
-            gotten = starter.objects_queue.get()
+            hv = manager.get_servo_angle()
+            if hv:
+                h, v = hv
+            gotten = manager.get_detected_objects()
             for got in gotten:
                 if got.x and got.y and got.z and got.snr:
                     x, y, z = MathUtils.b_to_d_rotation(got.x, got.y, got.z, h, v)
-                    xs.append(x)
-                    ys.append(y)
-                    zs.append(z)
-                    cs.append(got.snr)
-            sp._offsets3d = (np.array(xs),np.array(ys),np.array(zs))
-            cs_array = np.array(cs)
-            sp.set_array(cs_array)
-            sp.set_clim(min(cs), np.quantile(cs_array, 0.8))
-            axis.set_xlim([min(xs), max(xs)])
-            axis.set_ylim([min(ys), max(ys)])
-            axis.set_zlim([min(zs), max(zs)])
-            fig.canvas.draw_idle()
+                    plotter.xs.append(x)
+                    plotter.ys.append(y)
+                    plotter.zs.append(z)
+                    plotter.cs.append(got.snr)
+            plotter.draw()
             plot.show(block=False)
             plot.pause(0.01)
             del gotten
         plot.pause(0.01)
-        if not(starter.iwr6843_process.is_alive()) or not(starter.arduino_process.is_alive()):
-            del starter
-            starter = Starter(config_file_name)
+        manager.staying_alive()
 
 if __name__ == '__main__':
     main()
