@@ -38,6 +38,8 @@ class Plotter:
         self.axis.set_ylim([min(self.ys), max(self.ys)])
         self.axis.set_zlim([min(self.zs), max(self.zs)])
         self.fig.canvas.draw_idle()
+        plot.show(block=False)
+        plot.pause(0.01)
 
 def main():
     # Init manager
@@ -49,15 +51,19 @@ def main():
 
     # Define signal handler locally
     def signal_handler(sig, frame):
-        manager.yeet()
-        exit(0)
+        if sig == signal.SIGQUIT:
+            manager.yeet()
+            exit(0)
+        elif sig == signal.SIGINT:
+            manager.reset()
 
     # Start signal handler
     signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGQUIT, signal_handler)
 
     # Main loop
-    while True:
-        while not(manager.detected_objects_is_empty()):
+    while True:      
+        while manager.detected_objects_are_present():
             h = 0
             v = 0
             hv = manager.get_servo_angle()
@@ -72,8 +78,6 @@ def main():
                     plotter.zs.append(z)
                     plotter.cs.append(got.snr)
             plotter.draw()
-            plot.show(block=False)
-            plot.pause(0.01)
             del gotten
         plot.pause(0.01)
         manager.staying_alive()

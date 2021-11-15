@@ -61,8 +61,8 @@ class Manager:
             hv = self.angles_queue.get()
             return hv
     
-    def detected_objects_is_present(self) -> bool:
-        """detected_objects_is_present checks if there any queued detected objects
+    def detected_objects_are_present(self) -> bool:
+        """detected_objects_are_present checks if there any queued detected objects
 
         Returns
         -------
