@@ -1,76 +1,23 @@
 # Standard Library Imports
 import signal
 from sys import exit
+from abc import ABC, abstractclassmethod
 
 # Package Imports
-import numpy as np
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 
 # Self Imports
 from manager import Manager
 from data import MathUtils, DetectedObjectVoxel
-
-class Plotter:
-    """Plotter is a helper class to plot detected objects
-    """
-    def __init__(self):
-        """__init__ initialize the plotter
-        """
-        self.fig = plot.figure()
-        self.axis = self.fig.add_subplot(projection='3d')
-        self.xs = [0.0]
-        self.ys = [0.0]
-        self.zs = [0.0]
-        self.cs = [0.0]
-        self.sp = self.axis.scatter(np.array(self.xs),np.array(self.ys),np.array(self.zs),np.array(self.cs))
-        plot.ion()
-        plot.pause(0.01)
-        plot.show()
-        self.axis.set_xlabel("X Position (m)")
-        self.axis.set_ylabel("Y Position (m)")
-        self.axis.set_zlabel("Z Position (m)")
-        self.fig.colorbar(self.sp, label="SNR")
-
-    def draw(self):
-        """draw draw/re-draw this plot
-        """
-        self.sp._offsets3d = (np.array(self.xs),np.array(self.ys),np.array(self.zs))
-        cs_array = np.array(self.cs)
-        self.sp.set_array(cs_array)
-        self.sp.set_clim(min(self.cs), np.quantile(cs_array, 0.8))
-        self.axis.set_xlim([min(self.xs), max(self.xs)])
-        self.axis.set_ylim([min(self.ys), max(self.ys)])
-        self.axis.set_zlim([min(self.zs), max(self.zs)])
-        self.fig.canvas.draw_idle()
-        plot.show(block=False)
-        plot.pause(0.01)
-
-    def update(self, x: float, y: float, z: float, snr: float) -> None:
-        """update update the values to plot
-
-        Parameters
-        ----------
-        x : float
-            a x-position
-        y : float
-            a y-position
-        z : float
-            a z-position
-        snr : float
-            signal to noise ratio
-        """
-        self.xs.append(x)
-        self.ys.append(y)
-        self.zs.append(z)
-        self.cs.append(snr)
+from visualize import Plot1, Plot2
 
 def main():
     # Init manager
     config_file_name = '../data/xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
     manager = Manager(config_file_name)
 
-    # Init plotter
-    plotter = Plotter()
+    # Init plot
+    plot = Plot1()
 
     # Dictionary of voxels
     voxels_dict = {}
@@ -114,16 +61,16 @@ def main():
                     # Detected object is a new object
                     else:
                         voxels_dict[temp] = temp
-                        plotter.update(temp.x,temp.y,temp.z,temp.snr)
+                        plot.update(temp)
 
             # Draw/re-draw the plot
-            plotter.draw()
+            plot.draw()
 
             # Delete the list of detected objects
             del gotten
 
         # Pause for plot (for matplotlib to function)
-        plot.pause(0.01)
+        plt.pause(0.01)
 
         # Keep the program alive
         manager.staying_alive()

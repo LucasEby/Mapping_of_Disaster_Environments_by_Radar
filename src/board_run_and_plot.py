@@ -3,20 +3,20 @@ from sys import exit
 import signal
 
 # Package Imports
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 
 # Self Imports
 from manager import Manager
 from data import DetectedObjectVoxel
-from main import Plotter
+from visualize import Plot1, Plot2
 
 def main():
     # Init manager
     config_file_name = '../data/xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
     manager = Manager(config_file_name, run_arduino_process=False)
 
-    # Init plotter
-    plotter = Plotter()
+    # Init plot
+    plot = Plot2(0.1)
 
     # Dictinonary of voxels
     voxels_dict = {}
@@ -54,16 +54,16 @@ def main():
                     # Detected object is a new object
                     else:
                         voxels_dict[temp] = temp
-                        plotter.update(temp.x,temp.y,temp.z,temp.snr)
+                        plot.update(temp)
 
             # Draw/re-draw the plot
-            plotter.draw()
+            plot.draw()
 
             # Delete the list of detected objects
             del gotten
 
         # Pause for plot (for matplotlib to function)
-        plot.pause(0.01)
+        plt.pause(0.01)
 
         # Keep the program alive
         manager.staying_alive()
