@@ -11,7 +11,7 @@ from data import DetectedObject
 
 class Plot(ABC):
     """Plot is a base class to plot detected objects
-    """    
+    """
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
@@ -20,10 +20,10 @@ class Plot(ABC):
         ----------
         resolution : float, optional
             the plotting resolution, by default None
-        """        
+        """
         if resolution:
             self.resolution = resolution
-        
+
     def draw(self) -> None:
         """draw draw/re-draw this plot
         """
@@ -41,8 +41,8 @@ class Plot(ABC):
         """
         pass
 
-class Plot1(Plot):
-    """Plot1 is a helper class to plot detected objects
+class Plot3D(Plot):
+    """Plot3D is a helper class to plot detected objects
     """
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
@@ -51,8 +51,8 @@ class Plot1(Plot):
         ----------
         resolution : float, optional
             the plotting resolution, by default None
-        """    
-        super(Plot1, self).__init__(resolution)
+        """
+        super(Plot3D, self).__init__(resolution)
         self.fig = plt.figure()
         self.axis = self.fig.add_subplot(projection='3d')
         self.xs = [0.0]
@@ -94,7 +94,7 @@ class Plot1(Plot):
         self.zs.append(object.z)
         self.cs.append(object.snr)
 
-class Plot2(Plot):
+class Plot2D(Plot):
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
@@ -103,12 +103,14 @@ class Plot2(Plot):
         ----------
         resolution : float, optional
             the plotting resolution, by default None
-        """    
-        super(Plot2, self).__init__(resolution)
+        """
+        if resolution is None:
+            raise AttributeError("Resolution is not set of the 2D plot")
+        super(Plot2D, self).__init__(resolution)
         self.eps = np.finfo(float).eps
         self.eps = (1+self.eps)*self.eps
-        self.xaxis = np.arange(-10.0, 10.0, self.resolution)  
-        self.zaxis = np.arange(-10.0, 10.0, self.resolution)  
+        self.xaxis = np.arange(-10.0, 10.0, self.resolution)
+        self.zaxis = np.arange(-10.0, 10.0, self.resolution)
         self.grid = np.zeros((max(self.xaxis.shape), max(self.zaxis.shape)))
         self.fig = plt.figure()
         self.fig_num = plt.gcf().number
@@ -118,7 +120,7 @@ class Plot2(Plot):
         plt.title("Range Map")
         self.cbar = plt.colorbar()
         self.cbar.ax.set_ylabel("Range (m)")
-        
+
     def draw(self) -> None:
         """draw draw/re-draw this plot
         """
@@ -137,9 +139,9 @@ class Plot2(Plot):
         x = object.x
         y = object.y
         z = object.z
-        xloc = np.where(np.abs(x-self.xaxis)<(self.resolution-self.eps))
-        zloc = np.where(np.abs(z-self.zaxis)<(self.resolution-self.eps))
-        if len(xloc)>0 and len(zloc)>0:
+        xloc = np.where(np.abs(x-self.xaxis) < (self.resolution-self.eps))
+        zloc = np.where(np.abs(z-self.zaxis) < (self.resolution-self.eps))
+        if len(xloc) > 0 and len(zloc) > 0:
             xloc = xloc[0]
             zloc = zloc[0]
             self.grid[xloc,zloc] = y

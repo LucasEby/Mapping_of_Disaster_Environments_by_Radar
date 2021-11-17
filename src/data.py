@@ -4,10 +4,12 @@ from math import sqrt, atan, cos, sin
 from binascii import hexlify
 from codecs import decode
 from enum import Enum
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Any, Dict
 
 # Package Imports
 from serial import Serial
+import json
+import csv
 
 # Self Imports
 from control import Ports
@@ -191,6 +193,92 @@ class MathUtils:
             (z * cos(h) * sin(v))
         return rotated_x, rotated_y, rotated_z
 
+class Utils:
+    """Utils are a set of more generic utilities needed for this program and handling data
+    """
+    @classmethod
+    def dump_json_default(cls, obj: Any) -> Union[Dict, str]:
+        """dump_json_default default function that dumps an object to a json format
+
+        Parameters
+        ----------
+        obj : Any
+            the object
+
+        Returns
+        -------
+        Union[Dict, str]
+            returns the obj.__dict__ or obj.__repr__
+        """
+        try:
+            return obj.__dict__
+        except:
+            try:
+                str(obj)
+            except:
+                return object.__repr__(obj)
+
+    @classmethod
+    def dump_to_json(cls, data: Dict, file: str) -> None:
+        """dump_to_json dumps a Dict into a JSON
+
+        Parameters
+        ----------
+        data : Dict
+            the Dict to dump
+        file : str
+            the JSON filepath
+        """
+        with open(file, "w") as write_file:
+            json.dump(data, write_file, indent=4, default=Utils.dump_json_default)
+
+    @classmethod
+    def open_json(cls, file: str) -> Dict:
+        """open_json opens a JSON file
+
+        Parameters
+        ----------
+        file : str
+            the JSON filepath
+
+        Returns
+        -------
+        Dict
+            a dict representing the JSON objects in the file
+        """
+        with open(file, "r") as read_file:
+            return json.load(read_file)
+
+    @classmethod
+    def create_csv(cls, filepath: str, labels: list) -> None:
+        """create_csv creates a CSV file
+
+        Parameters
+        ----------
+        filepath : str
+            the filepath
+        labels : list
+            the labels (headers) for the csv row
+        """
+        with open(filepath, 'w+') as file:
+            writer = csv.writer(file, lineterminator='\r')
+            writer.writerow(labels)
+
+    @classmethod
+    def write_row_csv(cls, filepath: str, values: list) -> None:
+        """write_row_csv writes a list of values into a row in the CSV file
+
+        Parameters
+        ----------
+        filepath : str
+            the filepath
+        values : list
+            the values to write into a CSV row
+        """
+        with open(filepath, 'a+') as file:
+            writer = csv.writer(file, lineterminator='\r')
+            writer.writerow(values)
+
 class PacketInfo:
     """PacketInfo stores info on a data packet recieved from the IWR6843
     """
@@ -272,7 +360,7 @@ class DetectedObject:
         self.y = y
         self.z = z
         self.v = v
-        self.computed_range = range
+        self.computed_range = computed_range
         self.azimuth = azimuth
         self.elev_angle = elev_angle
         self.snr = snr
@@ -339,12 +427,11 @@ class DetectedObject:
         self.noise = noise
         return
 
-    def __repr__(self) -> str:
-        return str(self.__dict__)
-
 class DetectedObjectVoxel(DetectedObject):
     """DetectedObjectVoxel DetectedObjectVoxel stores info on a detected object parsed from a packet from the IWR6843 as well as functioning as a voxel
     """
+    OBJECT_THRESHOLD = 3
+
     def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, v: float = 0.0, computed_range: float = 0.0, azimuth: float = 0.0, elev_angle: float = 0.0, snr: float = 0.0, noise: float = 0.0, resolution: float = 0.04):
         """__init__ initialize this object
 
@@ -374,6 +461,8 @@ class DetectedObjectVoxel(DetectedObject):
         self.x = self._round_pos_to_res(self.x)
         self.y = self._round_pos_to_res(self.y)
         self.z = self._round_pos_to_res(self.z)
+        self.hits = 0
+        self.is_object = False
 
     def _round_pos_to_res(self, pos: float) -> float:
         """_round_pos_to_res rounds a passed in position to the nearest interval of resolution used for the voxel
@@ -457,6 +546,13 @@ class DetectedObjectVoxel(DetectedObject):
             return other.__hash__() == self.__hash__()
         else:
             return False
+
+    def visit(self) -> None:
+        """visit visit this voxel
+        """
+        self.hits += 1
+        self.is_object = self.hits > self.OBJECT_THRESHOLD
+        return
 
 class PacketHandler:
     """PacketHandler handles and parses a packet from the IWR6843

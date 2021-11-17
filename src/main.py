@@ -1,80 +1,57 @@
 # Standard Library Imports
 import signal
 from sys import exit
-from abc import ABC, abstractclassmethod
+import argparse
 
 # Package Imports
-import matplotlib.pyplot as plt
+None
 
 # Self Imports
 from manager import Manager
-from data import MathUtils, DetectedObjectVoxel
-from visualize import Plot1, Plot2
+from visualize import Plot2D, Plot3D
 
+# Define signal handler
+def signal_handler(sig, frame, manager: Manager = None):
+    if sig == signal.SIGQUIT:
+        manager.yeet(from_sigquit=True)
+        exit(0)
+    elif sig == signal.SIGINT:
+        manager.reset()
+
+# Main function
 def main():
-    # Init manager
-    config_file_name = '../data/xwr68xx_profile_2021_11_06T20_15_26_698.cfg'
-    manager = Manager(config_file_name)
+    # Arguments for this script
+    parser = argparse.ArgumentParser(description="Main")
+    parser.add_argument("--config-file", help="The configuration file to use to configure the IWR6843", default="../data/sample_profile.cfg", type=str)
+    parser.add_argument("--plot2d", help="Specifies if to use a 2D plot to visualize data", dest="plot", action="store_const", const=1)
+    parser.add_argument("--plot3d", help="Specifies if to use a 3D plot to visualize data", dest="plot", action="store_const", const=2)
+    parser.add_argument("--plot2d-resolution", help="Specifies the resolution used in the 2D plot", default=0.1, type=float)
+    parser.add_argument("--port-attach-time", help="Specifies how long the program should take to find/attach to serial ports before a timeout occurs", default=60.0, type=float)
+    parser.add_argument("--object-queue-size", help="Specifies how large the queue of objects can reach before no more objects can be added", default=100, type=int)
+    parser.add_argument("--use-arduino", help="Specifies if the arduino (outputting gimbal rotation) will be used", action="store_true")
+    parser.add_argument("--output", help="The file name/path of where data will be outputted, must be a .json file", default="output.json",type=str)
+    parser.set_defaults(plot=0, use_arduino=False)
+    args = parser.parse_args()
 
-    # Init plot
-    plot = Plot1()
+    # Handle the plot arguments
+    plot = None
+    if args.plot == 0:
+        raise AttributeError("The plot type was not specified either '--plot2d' or '--plot3d'")
+    elif args.plot == 1:
+        plot = Plot2D(args.plot2d_resolution)
+    elif args.plot == 2:
+        plot = Plot3D()    
+    
+    # Initialize the manager
+    manager = Manager(args.config_file, plot, port_attach_time=args.port_attach_time, queue_size=args.object_queue_size, run_arduino_process=args.use_arduino, output_file_name=args.output)
 
-    # Dictionary of voxels
-    voxels_dict = {}
+    # Handle SIGINT and SIGQUIT
+    signal_handler_use = lambda x, y: signal_handler(x,y,manager=manager)
+    signal.signal(signal.SIGINT, signal_handler_use)
+    signal.signal(signal.SIGQUIT, signal_handler_use)
 
-    # Define signal handler locally
-    def signal_handler(sig, frame):
-        if sig == signal.SIGQUIT:
-            manager.yeet()
-            exit(0)
-        elif sig == signal.SIGINT:
-            manager.reset()
-
-    # Start signal handler
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGQUIT, signal_handler)
-
-    # Main loop
-    while True:
-        # Always check if detected objects are present
-        while manager.detected_objects_are_present():
-            # Get the servo angle
-            h, v = 0, 0
-            hv = manager.get_servo_angle()
-            if hv:
-                h, v = hv
-
-            # Get detected objects
-            gotten = manager.get_detected_objects()
-
-            # Iterate through each detected object
-            for got in gotten:
-                # Check that this object is not None (i.e. has members)
-                if got.x and got.y and got.z and got.snr:
-                    # Rotate the coordinates
-                    x, y, z = MathUtils.b_to_d_rotation(got.x, got.y, got.z, h, v)
-
-                    # Check if this detected object is in a new voxel or not
-                    temp = DetectedObjectVoxel(x,y,z,snr=got.snr)
-                    if voxels_dict.get(temp):
-                        continue
-                    # Detected object is a new object
-                    else:
-                        voxels_dict[temp] = temp
-                        plot.update(temp)
-
-            # Draw/re-draw the plot
-            plot.draw()
-
-            # Delete the list of detected objects
-            del gotten
-
-        # Pause for plot (for matplotlib to function)
-        plt.pause(0.01)
-
-        # Keep the program alive
-        manager.staying_alive()
-
+    # Run the manager
+    manager.run()
 
 if __name__ == '__main__':
     main()

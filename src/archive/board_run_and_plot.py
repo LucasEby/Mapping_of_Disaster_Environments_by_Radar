@@ -8,7 +8,15 @@ import matplotlib.pyplot as plt
 # Self Imports
 from manager import Manager
 from data import DetectedObjectVoxel
-from visualize import Plot1, Plot2
+from visualize import Plot2D, Plot3D
+
+def signal_handler(sig, frame, manager: Manager = None):
+    if sig == signal.SIGQUIT:
+        print(voxels_dict)
+        manager.yeet()
+        exit(0)
+    elif sig == signal.SIGINT:
+        manager.reset()
 
 def main():
     # Init manager
@@ -16,23 +24,14 @@ def main():
     manager = Manager(config_file_name, run_arduino_process=False)
 
     # Init plot
-    plot = Plot2(0.1)
+    plot = Plot2D(0.1)
 
     # Dictinonary of voxels
     voxels_dict = {}
 
-    # Define signal handler locally
-    def signal_handler(sig, frame):
-        if sig == signal.SIGQUIT:
-            print(voxels_dict)
-            manager.yeet()
-            exit(0)
-        elif sig == signal.SIGINT:
-            manager.reset()
-
     # Start signal handler
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGQUIT, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler(manager=manager))
+    signal.signal(signal.SIGQUIT, signal_handler(manager=manager))
 
     # Main loop
     while True:
@@ -45,10 +44,8 @@ def main():
             for got in gotten:
                 # Check that this object is not None (i.e. has members)
                 if got.x and got.y and got.z and got.snr:
-                    # Rotate the coordinates
-                    temp = DetectedObjectVoxel(got.x,got.y,got.z,snr=got.snr)
-
                     # Check if this detected object is in a new voxel or not
+                    temp = DetectedObjectVoxel(got.x,got.y,got.z,snr=got.snr)
                     if voxels_dict.get(temp):
                         continue
                     # Detected object is a new object
