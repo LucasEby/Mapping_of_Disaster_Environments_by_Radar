@@ -212,7 +212,7 @@ class Utils:
         """
         try:
             return obj.__dict__
-        except:
+        except AttributeError:
             try:
                 str(obj)
             except:
@@ -427,6 +427,9 @@ class DetectedObject:
         self.noise = noise
         return
 
+    def __repr__(self):
+        return f"{self.x},{self.y},{self.z}"
+
 class DetectedObjectVoxel(DetectedObject):
     """DetectedObjectVoxel DetectedObjectVoxel stores info on a detected object parsed from a packet from the IWR6843 as well as functioning as a voxel
     """
@@ -553,6 +556,26 @@ class DetectedObjectVoxel(DetectedObject):
         self.hits += 1
         self.is_object = self.hits > self.OBJECT_THRESHOLD
         return
+
+def compare_detected_object_voxels(kv1: Tuple[DetectedObjectVoxel, DetectedObjectVoxel], kv2: Tuple[DetectedObjectVoxel, DetectedObjectVoxel]) -> int:
+    """compare_detected_object_voxels key function to compare two detected object voxels
+
+    Parameters
+    ----------
+    kv1 : a key, value pair of a detected object
+        Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
+    kv2 : [type]
+        Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
+
+    Returns
+    -------
+    int
+        the comparision value
+    """
+    # Get each voxel (key)
+    voxel1 = kv1[1]
+    voxel2 = kv2[1]
+    return (voxel1.x-voxel2.x)+(voxel1.y-voxel2.y)+(voxel1.z-voxel2.z)
 
 class PacketHandler:
     """PacketHandler handles and parses a packet from the IWR6843

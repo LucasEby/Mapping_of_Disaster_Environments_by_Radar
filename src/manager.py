@@ -1,6 +1,6 @@
 # Self Imports
 from control import Ports, Control
-from data import DetectedObject, DetectedObjectVoxel, MathUtils, Utils
+from data import DetectedObject, DetectedObjectVoxel, MathUtils, Utils, compare_detected_object_voxels
 from processes import IWR6843ReadProcess, ArduinoReadProcess
 from visualize import Plot
 
@@ -8,6 +8,7 @@ from visualize import Plot
 from multiprocessing import Queue
 from time import sleep
 from typing import Tuple, List, Dict
+from functools import cmp_to_key
 
 # Package Imports
 import matplotlib.pyplot as plt
@@ -155,7 +156,7 @@ class Manager:
             except AttributeError:
                 pass
 
-    def handle_detected_objects(self, detected_objects: List[DetectedObject], rotation: Tuple[int,int] = ()) -> None:
+    def handle_detected_objects(self, detected_objects: List[DetectedObject], rotation: Tuple[int,int] = (), sort: bool = False) -> None:
         """handle_detected_objects handles a list of detected objects if given a rotation angle or not
 
         Parameters
@@ -164,6 +165,8 @@ class Manager:
             the list of detected objects
         rotation : Tuple[int,int], optional
             the h and v rotation angles, by default ()
+        sort : bool
+            specifies whether or not to sort the dictionary after adding detected objects, by default False
         """
         # Loop through each detected object
         for object in detected_objects:
@@ -179,12 +182,15 @@ class Manager:
 
                 # Check if this detected object is in a new voxel or not
                 temp = DetectedObjectVoxel(x,y,z,snr=object.snr)
-                if self.voxels_dict.get(temp):
-                    self.voxels_dict[temp].visit()
+                try:
+                    getting = self.voxels_dict[temp]
+                    del getting
                 # Detected object is a new object
-                else:
+                except KeyError:
                     self.voxels_dict[temp] = temp
                     self.plot.update(temp)
+        if sort:
+            self.voxels_dict = {k: v for k, v in sorted(self.voxels_dict.items(), key=cmp_to_key(compare_detected_object_voxels))}
 
     def routine(self):
         """routine a single routine of the manager where it retrieves and handles data and re-draws the plot based on data
