@@ -1,3 +1,7 @@
+# Self Imports
+from manager import Manager
+from visualize import Plot2D, Plot3D
+
 # Standard Library Imports
 import signal
 from sys import exit
@@ -5,10 +9,6 @@ import argparse
 
 # Package Imports
 None
-
-# Self Imports
-from manager import Manager
-from visualize import Plot2D, Plot3D
 
 # Define signal handler
 def signal_handler(sig, frame, manager: Manager = None):
@@ -40,8 +40,8 @@ def main():
     elif args.plot == 1:
         plot = Plot2D(args.plot2d_resolution)
     elif args.plot == 2:
-        plot = Plot3D()    
-    
+        plot = Plot3D()
+
     # Initialize the manager
     manager = Manager(args.config_file, plot, port_attach_time=args.port_attach_time, queue_size=args.object_queue_size, run_arduino_process=args.use_arduino, output_file_name=args.output)
 
@@ -52,6 +52,7 @@ def main():
 
     # Run the manager
     manager.run()
+
 
 if __name__ == '__main__':
     main()
