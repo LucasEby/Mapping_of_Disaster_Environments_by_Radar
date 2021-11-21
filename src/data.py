@@ -464,7 +464,7 @@ class DetectedObjectVoxel(DetectedObject):
         self.x = self._round_pos_to_res(self.x)
         self.y = self._round_pos_to_res(self.y)
         self.z = self._round_pos_to_res(self.z)
-        self.hits = 0
+        self.hits = 1
         self.is_object = False
 
     def _round_pos_to_res(self, pos: float) -> float:
@@ -562,10 +562,10 @@ def compare_detected_object_voxels(kv1: Tuple[DetectedObjectVoxel, DetectedObjec
 
     Parameters
     ----------
-    kv1 : a key, value pair of a detected object
-        Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
-    kv2 : [type]
-        Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
+    kv1 : Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
+        a key, value pair of a detected object
+    kv2 : Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
+        a key, value pair of a detected object
 
     Returns
     -------
