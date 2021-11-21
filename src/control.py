@@ -46,7 +46,7 @@ class Ports:
     data_port: Union[str, Serial]
     arduino_port: Union[str, Serial]
 
-    def __init__(self, attach_time: float = None, attach_to_ports: bool = True, find_arduino: bool = True):
+    def __init__(self, attach_time: float = None, attach_to_ports: bool = True, find_arduino: bool = False):
         """__init__ [summary]
 
         Parameters
@@ -98,12 +98,14 @@ class Ports:
                     if attach_to_ports:
                         self.cli_port = Serial(cli_path, 115200, timeout=0.1)
                         self.data_port = Serial(data_path, 921600, timeout=0.1)
-                        self.arduino_port = Serial(arduino_path, 9600, timeout=0.1)
+                        if find_arduino:
+                            self.arduino_port = Serial(arduino_path, 9600, timeout=0.1)
                     # Leave data as the paths
                     else:
                         self.cli_port = cli_path
                         self.data_port = data_path
-                        self.arduino_port = arduino_path
+                        if find_arduino:
+                            self.arduino_port = arduino_path
                     break
                 # Keep on searching
                 else:

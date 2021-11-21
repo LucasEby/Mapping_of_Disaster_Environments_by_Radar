@@ -17,7 +17,7 @@ class Manager:
     """Manager starts and initializes any processes and objects for controlling and communicating with the IWR6843
     """
 
-    def __init__(self, config_file_name: str, plot: Plot, port_attach_time: float = 60.0, queue_size: int = 100, run_arduino_process: bool = True, output_file_name: str = 'output.json'):
+    def __init__(self, config_file_name: str, plot: Plot, port_attach_time: float = 60.0, queue_size: int = 100, run_arduino_process: bool = False, output_file_name: str = 'output.json'):
         """__init__ Initialize the manager with initial parameters and initialize its objects
 
         Parameters
