@@ -1,10 +1,9 @@
 class CubeComponents:
+    """
+    Stores the common data for each of the cube points.
+    """
 
-    def __init__(self):  # , x_translation, y_translation, z_translation):
-        """
-        Stores the data for each of the cube points.
-        """
-
+    # These are the edges that make up a cube.
     edges = (
         (0, 1),
         (0, 3),
@@ -20,6 +19,7 @@ class CubeComponents:
         (5, 7)
     )
 
+    # These are the surfaces that make up a cube.
     surfaces = (
         (0, 1, 2, 3),
         (3, 2, 7, 6),
@@ -29,6 +29,8 @@ class CubeComponents:
         (4, 0, 3, 6)
     )
 
+    # This is a list of 1531 color values for the cubes. Each color value represents a 0.2351404311 degree sliver of
+    # space.
     colors = (
         (1.0, 0.0, 0.0),
         (1.0, 0.00392156862745098, 0.0),

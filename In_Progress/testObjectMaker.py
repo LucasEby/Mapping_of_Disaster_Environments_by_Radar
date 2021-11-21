@@ -1,9 +1,6 @@
-# import random
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
-# from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT
 from OpenGL.GLU import gluPerspective
-from cube import Cube
 from cubeListCreator import CubeListCreator
 from frameCalculator import FrameCalculator
 from objectMaker import ObjectMaker

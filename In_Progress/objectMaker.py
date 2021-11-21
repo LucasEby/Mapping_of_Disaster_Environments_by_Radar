@@ -6,6 +6,16 @@ import math
 class ObjectMaker:
     def __init__(self, list_creator: CubeListCreator, x: float, y: float, z: float, angle: float,
                  resolution: float) -> None:
+        """
+        This class is used to round received data to create differently sized cube objects based on the distance
+        between received points.
+        :param list_creator: the list the cube object is added to.
+        :param x: the received x position
+        :param y: the received y position
+        :param z: the received z position
+        :param angle: the horizontal angle with respect to the origin that the point is located at.
+        :param resolution: the resolution of the data recieved.
+        """
         # Units are in meters:
         self.__round_amount = 1.0/3.0
         # Angle amount per color:
@@ -23,14 +33,28 @@ class ObjectMaker:
         self.__resolution = resolution
 
     def __min_bounds(self, coordinate) -> float:
-        print(str(coordinate - self.__round_amount - self.__resolution))
+        """
+        This function is used to calculate the minimum acceptable value for a coordinate to be rounded with.
+        :param coordinate: the coordinate being checked
+        :return: the minimum bounds of a coordinate
+        """
         return coordinate - self.__round_amount - self.__resolution
 
     def __max_bounds(self, coordinate) -> float:
-        print(str(coordinate + self.__round_amount + self.__resolution))
+        """
+        This function is used to calculate the maximum acceptable value for a coordinate to be rounded with.
+        :param coordinate: the coordinate being checked
+        :return: the maximum bounds of a coordinate
+        """
         return coordinate + self.__round_amount + self.__resolution
 
     def __check_and_update_x(self, x) -> bool:
+        """
+        This function is used to compare the new x coordinate with the current x coordinate. The current x coordinate
+        will be updated accordingly.
+        :param x: the x value that is being compared
+        :return: true if they are the same object, false otherwise.
+        """
         if (x >= self.__min_bounds(self.__x_min)) and (x <= self.__max_bounds(self.__x_max)):
             if x < self.__x_min:
                 self.__x_min = x
@@ -40,6 +64,12 @@ class ObjectMaker:
         return False
 
     def __check_and_update_y(self, y) -> bool:
+        """
+        This function is used to compare the new y coordinate with the current y coordinate. The current y coordinate
+        will be updated accordingly.
+        :param y: the y value that is being compared
+        :return: true if they are the same object, false otherwise.
+        """
         if (y >= self.__min_bounds(self.__y_min)) and (y <= self.__max_bounds(self.__y_max)):
             if y < self.__y_min:
                 self.__y_min = y
@@ -49,6 +79,12 @@ class ObjectMaker:
         return False
 
     def __check_and_update_z(self, z) -> bool:
+        """
+        This function is used to compare the new z coordinate with the current z coordinate. The current z coordinate
+        will be updated accordingly.
+        :param z: the z value that is being compared
+        :return: true if they are the same object, false otherwise.
+        """
         if (z >= self.__min_bounds(self.__z_min)) and (z <= self.__max_bounds(self.__z_max)):
             if z < self.__z_min:
                 self.__z_min = z
@@ -58,6 +94,11 @@ class ObjectMaker:
         return False
 
     def __update_angle(self, angle) -> None:
+        """
+        This function is used to update the angle of the stored object.
+        :param angle: the angle that is being compared.
+        :return: nothing
+        """
         if (angle >= self.__angle_min) and (angle <= self.__angle_max):
             if angle < self.__angle_min:
                 self.__angle_min = angle
@@ -65,6 +106,11 @@ class ObjectMaker:
                 self.__angle_max = angle
 
     def __calc_color(self, angle) -> int:
+        """
+        This function is used to calculate the index of the color list that the cube should be assigned to.
+        :param angle: the horizontal angle of the point with respect to the origin
+        :return: the index of the color table for the specific angle
+        """
         colorIndex = angle / self.__angle_per_color
         colorIndex = int(math.floor(colorIndex))
         if colorIndex == 1531:
@@ -72,6 +118,15 @@ class ObjectMaker:
         return colorIndex
 
     def add_new_point(self, x, y, z, horizontal_angle, is_object) -> None:
+        """
+        This function is used to add a new point to compare.
+        :param x: the x position of the point
+        :param y: the y position of the point
+        :param z: the z position of the point
+        :param horizontal_angle: the horizontal angle of the point with respect to the origin
+        :param is_object: a boolean representing whether or not this object has neighbors
+        :return: nothing
+        """
         if is_object:
             if not (self.__check_and_update_x(x) or self.__check_and_update_y(y) or self.__check_and_update_z(z)):
                 # this new point is for a new object. We need to send the old object to the cubeListCreator

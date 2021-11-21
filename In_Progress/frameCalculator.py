@@ -5,11 +5,22 @@ import numpy as np
 class FrameCalculator:
     def __init__(self):
         """
-        Stores the data for each of the cube points.
+        This class is used to translate the radar data into the origin's frame.
         """
+        # This variable represents the offset of the radar board in the y direction (the y direction is in reference
+        # to the board's reference frame, which has the y axis pointing in the direction of the radar signal).
         self.__y_off = 1
 
     def b_to_d_rotation(self, x, y, z, h_angle, v_angle) -> [float, float, float]:
+        """
+        This function is used to calculate the position of the cubes with respect to the origin.
+        :param x: the original x position
+        :param y: the original y position
+        :param z: the original z position
+        :param h_angle: the horizontal angle at which the radar board has been rotated
+        :param v_angle: the vertical angle at which the radar board has been rotated.
+        :return: the calculated float vertices as a list of length 3
+        """
         # v_servo origin is 180 degrees
         # h_servo origin is 115 degrees.
         h_angle = h_angle - 115
