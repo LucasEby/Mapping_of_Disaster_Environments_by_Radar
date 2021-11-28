@@ -5,10 +5,6 @@ from abc import ABC, abstractmethod
 # Package Imports
 import numpy as np
 import matplotlib.pyplot as plt
-import open3d as o3d
-
-# Self Imports
-from data import DetectedObject
 
 # Self Imports
 from data import DetectedObject, DetectedObjectVoxel, MathUtils
@@ -16,11 +12,7 @@ import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
 from OpenGL.GLU import gluPerspective
 from cubeListCreator import CubeListCreator
-from frameCalculator import FrameCalculator
 from objectMaker import ObjectMaker
-import keyboard
-import random
-
 
 class Plot(ABC):
     """Plot is a base class to plot detected objects
