@@ -1,10 +1,12 @@
 
 # Standard Library Imports
 from abc import ABC, abstractmethod
+from time import sleep
 
 # Package Imports
 import numpy as np
 import matplotlib.pyplot as plt
+import open3d as o3d
 
 # Self Imports
 from data import DetectedObject
@@ -94,6 +96,54 @@ class Plot3D(Plot):
         self.zs.append(object.z)
         self.cs.append(object.snr)
 
+class PlotOpen3D(Plot):
+    def __init__(self, resolution: float = None):
+        """__init__ initialize the plot
+
+        Parameters
+        ----------
+        resolution : float, optional
+            the plotting resolution, by default None
+        """
+        if resolution is None:
+            raise AttributeError("Resolution is not set of the 3D plot")
+        super(PlotOpen3D, self).__init__(resolution)
+        self.xs = [0.0]
+        self.ys = [0.0]
+        self.zs = [0.0]
+        self.points = np.vstack((np.array(self.xs), np.array(self.zs), np.array(self.ys))).T
+        self.pcd = o3d.geometry.PointCloud()
+        self.pcd.points = o3d.utility.Vector3dVector(self.points)
+        self.voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pcd,voxel_size=self.resolution)
+        self.vis = o3d.visualization.Visualizer()
+        self.vis.create_window()
+        self.vis.add_geometry(self.voxel_grid)
+
+    def draw(self) -> None:
+        """draw draw/re-draw this plot
+        """
+        self.points = np.vstack((np.array(self.xs), np.array(self.zs), np.array(self.ys))).T
+        self.pcd.points = o3d.utility.Vector3dVector(self.points)
+        self.vis.remove_geometry(self.voxel_grid)
+        self.voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pcd,voxel_size=self.resolution)
+        self.vis.add_geometry(self.voxel_grid)
+        self.vis.poll_events()
+        self.vis.update_renderer()
+        sleep(0.1)
+
+    def update(self, object: DetectedObject) -> None:
+        """update update the values to plot
+
+        Parameters
+        ----------
+        object : DetectedObject
+            the object used to update the values
+        """
+        self.xs.append(object.x)
+        self.ys.append(object.y)
+        self.zs.append(object.z)
+
+
 class Plot2D(Plot):
 
     def __init__(self, resolution: float = None):
@@ -109,8 +159,9 @@ class Plot2D(Plot):
         super(Plot2D, self).__init__(resolution)
         self.eps = np.finfo(float).eps
         self.eps = (1+self.eps)*self.eps
-        self.xaxis = np.arange(-10.0, 10.0, self.resolution)
-        self.zaxis = np.arange(-10.0, 10.0, self.resolution)
+        self.xaxis = np.arange(-5.0, 5.0, self.resolution)
+        self.zaxis = np.arange(-5.0, 5.0, self.resolution)
+        self.ys = []
         self.grid = np.zeros((max(self.xaxis.shape), max(self.zaxis.shape)))
         self.fig = plt.figure()
         self.fig_num = plt.gcf().number
@@ -119,6 +170,7 @@ class Plot2D(Plot):
         plt.ylabel("Z Axis (m)")
         plt.title("Range Map")
         self.cbar = plt.colorbar()
+        plt.clim(0.0, 5.0)
         self.cbar.ax.set_ylabel("Range (m)")
 
     def draw(self) -> None:
@@ -144,5 +196,8 @@ class Plot2D(Plot):
         if len(xloc) > 0 and len(zloc) > 0:
             xloc = xloc[0]
             zloc = zloc[0]
-            self.grid[xloc,zloc] = y
-        plt.clim(np.min(self.grid), np.max(self.grid))
+            try:
+                self.grid[xloc,zloc] = y
+                self.ys.append(y)
+            except IndexError:
+                pass

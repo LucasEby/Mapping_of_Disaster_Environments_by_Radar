@@ -1,6 +1,6 @@
 # Self Imports
 from manager import Manager
-from visualize import Plot2D, Plot3D
+from visualize import Plot2D, Plot3D, PlotOpen3D
 
 # Standard Library Imports
 import signal
@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--config-file", help="The configuration file to use to configure the IWR6843", default="../data/sample_profile.cfg", type=str)
     parser.add_argument("--plot2d", help="Specifies if to use a 2D plot to visualize data", dest="plot", action="store_const", const=1)
     parser.add_argument("--plot3d", help="Specifies if to use a 3D plot to visualize data", dest="plot", action="store_const", const=2)
+    parser.add_argument("--plot-open3d", help="Specifies if to use a 3D plot to visualize data", dest="plot", action="store_const", const=3)
     parser.add_argument("--plot2d-resolution", help="Specifies the resolution used in the 2D plot", default=0.1, type=float)
     parser.add_argument("--port-attach-time", help="Specifies how long the program should take to find/attach to serial ports before a timeout occurs", default=60.0, type=float)
     parser.add_argument("--object-queue-size", help="Specifies how large the queue of objects can reach before no more objects can be added", default=100, type=int)
@@ -41,6 +42,8 @@ def main():
         plot = Plot2D(args.plot2d_resolution)
     elif args.plot == 2:
         plot = Plot3D()
+    elif args.plot == 3:
+        plot = PlotOpen3D(args.plot2d_resolution)
 
     # Initialize the manager
     manager = Manager(args.config_file, plot, port_attach_time=args.port_attach_time, queue_size=args.object_queue_size, run_arduino_process=args.use_arduino, output_file_name=args.output)

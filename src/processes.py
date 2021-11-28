@@ -100,7 +100,7 @@ class ArduinoReadProcess(Process):
                 read_buffer = read_buffer.decode('utf-8')
                 read_buffer = read_buffer.split(",")
                 try:
-                    hv_values = (int(read_buffer[0]),int(read_buffer[1]))
+                    hv_values = (float(read_buffer[0]),float(read_buffer[1]))
                     self.queue.put(hv_values)
                 except (IndexError):
                     break

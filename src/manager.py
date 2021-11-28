@@ -32,6 +32,7 @@ class Manager:
             the size of the queue from reading from the serial port, by default 100
         """
         self.config_file_name = config_file_name
+        self.rotation = (0.0,0.0)
         self.port_attach_time = port_attach_time
         self.run_arduino_process = run_arduino_process
         self.output_file_name = output_file_name
@@ -71,7 +72,9 @@ class Manager:
         if self.run_arduino_process:
             if not(self.angles_queue.empty()):
                 hv = self.angles_queue.get()
-                return hv
+                hv_new = (MathUtils.radians_to_degrees(hv[0]), MathUtils.radians_to_degrees(hv[1]))
+                return hv_new
+        return None
 
     def detected_objects_are_present(self) -> bool:
         """detected_objects_are_present checks if there any queued detected objects
@@ -177,8 +180,7 @@ class Manager:
                 z = object.z
 
                 # Rotate the coordinates if needed
-                if rotation:
-                    x,y,z = MathUtils.b_to_d_rotation(x,y,z,rotation[0],rotation[1])
+                x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
 
                 # Check if this detected object is in a new voxel or not
                 temp = DetectedObjectVoxel(x,y,z,snr=object.snr)
@@ -197,21 +199,22 @@ class Manager:
         """
 
         # Get the rotation angles if present or using arduino process to get the servo angle
-        rotation = ()
         if self.run_arduino_process:
-            rotation = self.get_servo_angle()
+            temp = self.get_servo_angle()
+            if temp and (temp != self.rotation):
+                self.rotation = temp
 
         # Get detected objects
         detected_objects = self.get_detected_objects()
 
         # Handle the detected objects
-        self.handle_detected_objects(detected_objects, rotation)
+        self.handle_detected_objects(detected_objects, self.rotation)
 
         # Draw/re-draw the plot
         self.plot.draw()
 
         # Delete objects no longer being used
-        del rotation
+        #del rotation
         del detected_objects
 
         return
