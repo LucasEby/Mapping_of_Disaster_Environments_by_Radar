@@ -248,4 +248,5 @@ class PlotCubes(Plot):
         """
         azimuth = 90.0+ MathUtils.get_azimuth(object.x, object.z)
         if object.z >= 0.0:
-            self.maker.add_new_point(object.x, object.y, -50*object.z, azimuth, True)
+            # self.maker.add_new_point(object.x, object.y, -50*object.z, azimuth, True)
+            self.maker.add_new_point(50*object.x, 50*object.y, -50*object.z, azimuth, True)

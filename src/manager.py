@@ -14,6 +14,7 @@ from functools import cmp_to_key
 import matplotlib.pyplot as plt
 import pygame
 import keyboard
+from sys import exit
 
 
 class Manager:
@@ -218,13 +219,38 @@ class Manager:
         self.handle_detected_objects(detected_objects, self.rotation)
 
         # Draw/re-draw the plot
-        self.plot.draw()
+        self.plot.draw(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
 
         # Delete objects no longer being used
         #del rotation
         del detected_objects
 
         return
+
+    def handle_keyboard_inputs(self):
+        if keyboard.is_pressed("left"):
+            self.y_rotation = self.y_rotation - 10
+        if keyboard.is_pressed("right"):
+            self.y_rotation = self.y_rotation + 10
+        if keyboard.is_pressed("up"):
+            self.x_rotation = self.x_rotation - 10
+        if keyboard.is_pressed("down"):
+            self.x_rotation = self.x_rotation + 10
+        if keyboard.is_pressed("/"):
+            self.z_translation = self.z_translation + 10
+        if keyboard.is_pressed("Shift"):
+            self.z_translation = self.z_translation - 10
+        if keyboard.is_pressed(";"):
+            self.y_translation = self.y_translation - 10
+        if keyboard.is_pressed("\'"):
+            self.y_translation = self.y_translation + 10
+        if keyboard.is_pressed("."):
+            # resets all keys
+            self.x_rotation = 0
+            self.y_rotation = 0
+            self.z_translation = 0
+            self.y_translation = 0
+
 
     def run(self):
         """
@@ -235,31 +261,12 @@ class Manager:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    quit()
+                    self.yeet(from_sigquit=True)
+                    exit(0)
+            self.handle_keyboard_inputs()
             while self.detected_objects_are_present():
+                self.handle_keyboard_inputs()
                 self.routine()
-                if keyboard.is_pressed("left"):
-                    self.y_rotation = self.y_rotation - 10
-                if keyboard.is_pressed("right"):
-                    self.y_rotation = self.y_rotation + 10
-                if keyboard.is_pressed("up"):
-                    self.x_rotation = self.x_rotation - 10
-                if keyboard.is_pressed("down"):
-                    self.x_rotation = self.x_rotation + 10
-                if keyboard.is_pressed("/"):
-                    self.z_translation = self.z_translation + 10
-                if keyboard.is_pressed("Shift"):
-                    self.z_translation = self.z_translation - 10
-                if keyboard.is_pressed(";"):
-                    self.y_translation = self.y_translation - 10
-                if keyboard.is_pressed("\'"):
-                    self.y_translation = self.y_translation + 10
-                if keyboard.is_pressed("."):
-                    # resets all keys
-                    self.x_rotation = 0
-                    self.y_rotation = 0
-                    self.z_translation = 0
-                    self.y_translation = 0
                 self.plot.cube_list.plotCubes(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
                 sleep(0.1)
             sleep(0.1)

@@ -8,11 +8,12 @@ from sys import exit
 import argparse
 
 # Package Imports
-None
+import pygame
 
 # Define signal handler
 def signal_handler(sig, frame, manager: Manager = None):
     if sig == signal.SIGQUIT:
+        pygame.quit()
         manager.yeet(from_sigquit=True)
         exit(0)
     elif sig == signal.SIGINT:
