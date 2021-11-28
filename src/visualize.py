@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 
 # Package Imports
 import numpy as np
+import matplotlib
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 
 # Self Imports

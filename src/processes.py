@@ -14,7 +14,6 @@ class IWR6843ReadProcess(Process):
     """
     def __init__(self, queue: Queue, serial_port: str, baudrate: int, timeout: float):
         """__init__ sets up the data for the serial process
-
         Parameters
         ----------
         queue : Queue
@@ -34,7 +33,6 @@ class IWR6843ReadProcess(Process):
 
     def read_serial(self, serial_port: str, baudrate: int, timeout: float):
         """read_serial is the target of this process which starts the serial port and reads from the serial port
-
         Parameters
         ----------
         serial_port : str
@@ -60,9 +58,8 @@ class IWR6843ReadProcess(Process):
 class ArduinoReadProcess(Process):
     """ArduinoReadProcess represents a process to handle reading from the arduino serial port in another process
     """
-    def __init__(self, queue: Queue, serial_port: str, baudrate: int, timeout: float):
+    def __init__(self, input_queue: Queue, queue: Queue, serial_port: str, baudrate: int, timeout: float):
         """__init__ sets up the data for the serial process
-
         Parameters
         ----------
         serial_port : str
@@ -73,13 +70,13 @@ class ArduinoReadProcess(Process):
             the timeout to add to the serial port
         """
         super(ArduinoReadProcess, self).__init__(target=self.read_serial, args=(serial_port, baudrate, timeout))
+        self.input_queue = input_queue
         self.queue = queue
         self.serial = None
         self.target = self.read_serial
 
     def read_serial(self, serial_port: str, baudrate: int, timeout: float):
         """read_serial is the target of this process which starts the serial port and reads from the serial port
-
         Parameters
         ----------
         serial_port : str
@@ -91,6 +88,12 @@ class ArduinoReadProcess(Process):
         """
         self.serial = Serial(serial_port, baudrate=baudrate, timeout=timeout)
         while True:
+            if not(self.input_queue.empty()):
+                input_angles = self.input_queue.get().split(" ")
+                self.serial.write(bytes(input_angles[0], 'utf-8'))
+                sleep(0.5)
+                self.serial.write(bytes(input_angles[1], 'utf-8'))
+                sleep(0.1)
             read_buffer = []
             try:
                 read_buffer = self.serial.readline()
@@ -100,8 +103,11 @@ class ArduinoReadProcess(Process):
                 read_buffer = read_buffer.decode('utf-8')
                 read_buffer = read_buffer.split(",")
                 try:
-                    hv_values = (int(read_buffer[0]),int(read_buffer[1]))
+                    # hv_values = (int(read_buffer[0]),int(read_buffer[1]))
+                    hv_values = (float(read_buffer[0]),float(read_buffer[1]))
                     self.queue.put(hv_values)
+                    print(hv_values)
                 except (IndexError):
                     break
             sleep(0.01)
+            

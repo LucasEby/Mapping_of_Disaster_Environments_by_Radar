@@ -3,6 +3,8 @@ from control import Ports, Control
 from data import DetectedObject, DetectedObjectVoxel, MathUtils, Utils, compare_detected_object_voxels
 from processes import IWR6843ReadProcess, ArduinoReadProcess
 from visualize import Plot
+from page_control import PageControl
+from servos import Servos
 
 # Standard Library Imports
 from multiprocessing import Queue
@@ -43,7 +45,10 @@ class Manager:
         self.iwr6843_process = None
         if self.run_arduino_process:
             self.angles_queue = Queue(1)
+            self.input_angles_queue = Queue(1)  # TODO: my edits
             self.arduino_process = None
+        # self.page: Page = Page()
+        self.page_control: PageControl = PageControl(self.input_angles_queue)
         self.reset()
 
     def reset(self) -> None:
@@ -53,7 +58,7 @@ class Manager:
         self.ports = Ports(attach_time=self.port_attach_time, attach_to_ports=False, find_arduino=self.run_arduino_process)
         self.iwr6843_process = IWR6843ReadProcess(self.objects_queue, self.ports.data_port, 921600, 0.1)
         if self.run_arduino_process:
-            self.arduino_process = ArduinoReadProcess(self.angles_queue, self.ports.arduino_port, 9600, 0.1)
+            self.arduino_process = ArduinoReadProcess(self.input_angles_queue, self.angles_queue, self.ports.arduino_port, 9600, 0.1)
         self.control = Control(self.config_file_name, self.ports)
         sleep(0.1)
         self.iwr6843_process.start()
@@ -219,6 +224,7 @@ class Manager:
     def run(self):
         """run the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and keeps itself alive
         """
+        self.page_control.start_page()   # TODO:
         while True:
             while self.detected_objects_are_present():
                 self.routine()
