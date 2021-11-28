@@ -238,35 +238,17 @@ class Manager:
                     quit()
             while self.detected_objects_are_present():
                 self.routine()
-                # self.plot.cube_list.rotate_horizontally(0.1))
-                # keyboard.on_press_key("left", self.plot.cube_list.rotate_horizontally(0.1))
-                # keyboard.on_press_key("right", self.plot.cube_list.rotate_horizontally(-0.1))
-                # keyboard.on_press_key("up", self.plot.cube_list.rotate_vertically(-0.1))
-                # keyboard.on_press_key("down", self.plot.cube_list.rotate_vertically(0.1))
                 if keyboard.is_pressed("left"):
-                    #self.plot.cube_list.rotate_horizontally(0.1)
-                    # glRotatef(-0.1, 0, 1, 0)
-                    #print("left")
                     self.y_rotation = self.y_rotation - 10
                 if keyboard.is_pressed("right"):
-                    #self.plot.cube_list.rotate_horizontally(-0.1)
-                    # glRotatef(0.1, 0, 1, 0)
-                    #print("right")
                     self.y_rotation = self.y_rotation + 10
                 if keyboard.is_pressed("up"):
-                    #self.plot.cube_list.rotate_vertically(-0.1)
-                    #glRotatef(-0.1, 1, 0, 0)
-                    #print("up")
                     self.x_rotation = self.x_rotation - 10
                 if keyboard.is_pressed("down"):
-                    #self.plot.cube_list.rotate_vertically(0.1)
-                    #glRotatef(0.1, 1, 0, 0)
-                    #print("down")
                     self.x_rotation = self.x_rotation + 10
                 if keyboard.is_pressed("/"):
                     self.z_translation = self.z_translation + 10
                 if keyboard.is_pressed("Shift"):
-                    #if self.z_translation < -1:
                     self.z_translation = self.z_translation - 10
                 if keyboard.is_pressed(";"):
                     self.y_translation = self.y_translation - 10
@@ -278,7 +260,6 @@ class Manager:
                     self.y_rotation = 0
                     self.z_translation = 0
                     self.y_translation = 0
-                    print("keys were reset")
                 self.plot.cube_list.plotCubes(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
                 sleep(0.1)
             sleep(0.1)
