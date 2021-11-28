@@ -12,6 +12,9 @@ from functools import cmp_to_key
 
 # Package Imports
 import matplotlib.pyplot as plt
+import pygame
+import keyboard
+
 
 class Manager:
     """Manager starts and initializes any processes and objects for controlling and communicating with the IWR6843
@@ -46,6 +49,10 @@ class Manager:
             self.angles_queue = Queue(1)
             self.arduino_process = None
         self.reset()
+        self.x_rotation = 0
+        self.y_rotation = 0
+        self.z_translation = 0
+        self.y_translation = 0
 
     def reset(self) -> None:
         """reset resets the manager, and restarts any processes, port finders, or controllers
@@ -220,10 +227,60 @@ class Manager:
         return
 
     def run(self):
-        """run the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and keeps itself alive
+        """
+        run the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and
+        keeps itself alive
         """
         while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
             while self.detected_objects_are_present():
                 self.routine()
-            plt.pause(0.01)
+                # self.plot.cube_list.rotate_horizontally(0.1))
+                # keyboard.on_press_key("left", self.plot.cube_list.rotate_horizontally(0.1))
+                # keyboard.on_press_key("right", self.plot.cube_list.rotate_horizontally(-0.1))
+                # keyboard.on_press_key("up", self.plot.cube_list.rotate_vertically(-0.1))
+                # keyboard.on_press_key("down", self.plot.cube_list.rotate_vertically(0.1))
+                if keyboard.is_pressed("left"):
+                    #self.plot.cube_list.rotate_horizontally(0.1)
+                    # glRotatef(-0.1, 0, 1, 0)
+                    #print("left")
+                    self.y_rotation = self.y_rotation - 10
+                if keyboard.is_pressed("right"):
+                    #self.plot.cube_list.rotate_horizontally(-0.1)
+                    # glRotatef(0.1, 0, 1, 0)
+                    #print("right")
+                    self.y_rotation = self.y_rotation + 10
+                if keyboard.is_pressed("up"):
+                    #self.plot.cube_list.rotate_vertically(-0.1)
+                    #glRotatef(-0.1, 1, 0, 0)
+                    #print("up")
+                    self.x_rotation = self.x_rotation - 10
+                if keyboard.is_pressed("down"):
+                    #self.plot.cube_list.rotate_vertically(0.1)
+                    #glRotatef(0.1, 1, 0, 0)
+                    #print("down")
+                    self.x_rotation = self.x_rotation + 10
+                if keyboard.is_pressed("/"):
+                    self.z_translation = self.z_translation + 10
+                if keyboard.is_pressed("Shift"):
+                    #if self.z_translation < -1:
+                    self.z_translation = self.z_translation - 10
+                if keyboard.is_pressed(";"):
+                    self.y_translation = self.y_translation - 10
+                if keyboard.is_pressed("\'"):
+                    self.y_translation = self.y_translation + 10
+                if keyboard.is_pressed("."):
+                    # resets all keys
+                    self.x_rotation = 0
+                    self.y_rotation = 0
+                    self.z_translation = 0
+                    self.y_translation = 0
+                    print("keys were reset")
+                self.plot.cube_list.plotCubes(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
+                sleep(0.1)
+            sleep(0.1)
+            #plt.pause(0.01)
             self.staying_alive()

@@ -1,15 +1,33 @@
 
 # Standard Library Imports
 from abc import ABC, abstractmethod
+<<<<<<< HEAD
 from time import sleep
+=======
+>>>>>>> origin/LucasNov28NonArduino
 
 # Package Imports
 import numpy as np
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
 import open3d as o3d
 
 # Self Imports
 from data import DetectedObject
+=======
+
+# Self Imports
+from data import DetectedObject, DetectedObjectVoxel, MathUtils
+import pygame
+from pygame.locals import DOUBLEBUF, OPENGL
+from OpenGL.GLU import gluPerspective
+from cubeListCreator import CubeListCreator
+from frameCalculator import FrameCalculator
+from objectMaker import ObjectMaker
+import keyboard
+import random
+
+>>>>>>> origin/LucasNov28NonArduino
 
 class Plot(ABC):
     """Plot is a base class to plot detected objects
@@ -96,6 +114,7 @@ class Plot3D(Plot):
         self.zs.append(object.z)
         self.cs.append(object.snr)
 
+<<<<<<< HEAD
 class PlotOpen3D(Plot):
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
@@ -143,6 +162,8 @@ class PlotOpen3D(Plot):
         self.ys.append(object.y)
         self.zs.append(object.z)
 
+=======
+>>>>>>> origin/LucasNov28NonArduino
 
 class Plot2D(Plot):
 
@@ -159,9 +180,14 @@ class Plot2D(Plot):
         super(Plot2D, self).__init__(resolution)
         self.eps = np.finfo(float).eps
         self.eps = (1+self.eps)*self.eps
+<<<<<<< HEAD
         self.xaxis = np.arange(-5.0, 5.0, self.resolution)
         self.zaxis = np.arange(-5.0, 5.0, self.resolution)
         self.ys = []
+=======
+        self.xaxis = np.arange(-10.0, 10.0, self.resolution)
+        self.zaxis = np.arange(-10.0, 10.0, self.resolution)
+>>>>>>> origin/LucasNov28NonArduino
         self.grid = np.zeros((max(self.xaxis.shape), max(self.zaxis.shape)))
         self.fig = plt.figure()
         self.fig_num = plt.gcf().number
@@ -170,7 +196,10 @@ class Plot2D(Plot):
         plt.ylabel("Z Axis (m)")
         plt.title("Range Map")
         self.cbar = plt.colorbar()
+<<<<<<< HEAD
         plt.clim(0.0, 5.0)
+=======
+>>>>>>> origin/LucasNov28NonArduino
         self.cbar.ax.set_ylabel("Range (m)")
 
     def draw(self) -> None:
@@ -196,8 +225,76 @@ class Plot2D(Plot):
         if len(xloc) > 0 and len(zloc) > 0:
             xloc = xloc[0]
             zloc = zloc[0]
+<<<<<<< HEAD
             try:
                 self.grid[xloc,zloc] = y
                 self.ys.append(y)
             except IndexError:
                 pass
+=======
+            self.grid[xloc,zloc] = y
+        plt.clim(np.min(self.grid), np.max(self.grid))
+
+
+class PlotCubes(Plot):
+    #object_maker
+    #cube_list_creator
+
+    #def update(self, object: DetectedObject) -> None:
+    #    object_maker.add_new_point(object.x, object.y, object.z, object.azimuth, object.is_object)
+
+    def __init__(self, resolution: float = None):
+        """__init__ initialize the plot
+
+        Parameters
+        ----------
+        resolution : float, optional
+            the plotting resolution, by default None
+        """
+        super(PlotCubes, self).__init__(resolution)
+        self.cube_list = CubeListCreator()
+        self.maker = ObjectMaker(self.cube_list, 0, 0, 0, 0, self.resolution)
+        self.x_rotation = 0
+        self.y_rotation = 0
+        """
+        self.maker.add_new_point(0, 1, -10, 5, True)
+        self.maker.add_new_point(0, 1.3, -10, 5, True)
+        self.maker.add_new_point(0, 1.6, -10, 5, True)
+        self.maker.add_new_point(0, 1.9, -10, 5, True)
+        self.maker.add_new_point(0, 2.1, -10, 5, True)
+        self.maker.add_new_point(99, 99, 99, 5, True)
+
+        self.maker.add_new_point(0, 1, -10, 300, True)
+        self.maker.add_new_point(0, 10, -100, 300, True)
+        self.maker.add_new_point(0, 11, -10, 300, True)
+        self.maker.add_new_point(0, 12, -10, 300, True)
+        self.maker.add_new_point(0, 2.1, -10, 300, True)
+        self.maker.add_new_point(99, 99, 99, 5, True)
+        """
+        pygame.init()
+        display = (800, 600)
+        pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
+        pygame.display.toggle_fullscreen()
+        gluPerspective(45, (display[0] / display[1]), 1, 1000.0)
+
+    def draw(self, x_rotation , y_rotation, z_translation, y_translation) -> None:
+        """draw draw/re-draw this plot
+        """
+        self.cube_list.plotCubes(x_rotation, y_rotation, z_translation, y_translation)
+        # pygame.time.wait(25)  # 50)
+
+    def update(self, object: DetectedObjectVoxel) -> None:
+        """update update the values to plot
+
+        Parameters
+        ----------
+        object : DetectedObject
+            the object used to update the values
+        """
+        azimuth = 90.0+ MathUtils.get_azimuth(object.x, object.z)
+        #azimuth = random.randint(0, 360)
+        # print(f"update {object.x},{object.y},{object.z},{azimuth},{True}")
+        # azimuth = MathUtils.get_azimuth(object.x, object.z)
+        if object.y >= 0.0:
+            self.maker.add_new_point(object.x, object.z, -50*object.y, azimuth, True)
+>>>>>>> origin/LucasNov28NonArduino
