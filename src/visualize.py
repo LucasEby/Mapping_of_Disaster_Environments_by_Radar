@@ -247,5 +247,5 @@ class PlotCubes(Plot):
             the object used to update the values
         """
         azimuth = 90.0+ MathUtils.get_azimuth(object.x, object.z)
-        if object.y >= 0.0:
-            self.maker.add_new_point(object.x, object.z, -50*object.y, azimuth, True)
+        if object.z >= 0.0:
+            self.maker.add_new_point(object.x, object.y, -50*object.z, azimuth, True)
