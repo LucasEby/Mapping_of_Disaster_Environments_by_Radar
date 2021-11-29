@@ -57,6 +57,18 @@ class IWR6843ReadProcess(Process):
                     self.queue.put(parsed)
             sleep(0.01)
 
+    def kill(self):
+        try:
+            self.serial.close()
+            del self.serial
+        except AttributeError:
+            pass
+        try:
+            del self.parser
+        except AttributeError:
+            pass
+        super().kill()
+
 class ArduinoReadProcess(Process):
     """ArduinoReadProcess represents a process to handle reading from the arduino serial port in another process
     """
@@ -97,11 +109,22 @@ class ArduinoReadProcess(Process):
             except (SerialException, OSError, error):
                 break
             if len(read_buffer) > 0:
-                read_buffer = read_buffer.decode('utf-8')
-                read_buffer = read_buffer.split(",")
                 try:
-                    hv_values = (float(read_buffer[0]),float(read_buffer[1]))
-                    self.queue.put(hv_values)
-                except (IndexError):
-                    break
+                    read_buffer = read_buffer.decode('utf-8')
+                    read_buffer = read_buffer.split(",")
+                    try:
+                        hv_values = (float(read_buffer[0]),float(read_buffer[1]))
+                        self.queue.put(hv_values)
+                    except IndexError:
+                        break
+                except UnicodeDecodeError:
+                    pass
             sleep(0.01)
+
+    def kill(self):
+        try:
+            self.serial.close()
+            del self.serial
+        except AttributeError:
+            pass
+        super().kill()

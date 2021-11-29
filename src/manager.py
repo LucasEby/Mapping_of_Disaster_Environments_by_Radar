@@ -9,6 +9,7 @@ from multiprocessing import Queue
 from time import sleep
 from typing import Tuple, List, Dict
 from functools import cmp_to_key
+from enum import Enum
 
 # Package Imports
 import matplotlib.pyplot as plt
@@ -16,12 +17,17 @@ import pygame
 import keyboard
 from sys import exit
 
+class PlotMode(Enum):
+    NONE = 0
+    PLOT_2D = 1
+    PLOT_3D = 2
+    PLOT_CUBES = 3
 
 class Manager:
     """Manager starts and initializes any processes and objects for controlling and communicating with the IWR6843
     """
 
-    def __init__(self, config_file_name: str, plot: Plot, port_attach_time: float = 60.0, queue_size: int = 100, run_arduino_process: bool = False, output_file_name: str = 'output.json'):
+    def __init__(self, config_file_name: str, plot: Plot, plot_mode: PlotMode, port_attach_time: float = 60.0, queue_size: int = 100, run_arduino_process: bool = False, output_file_name: str = 'output.json'):
         """__init__ Initialize the manager with initial parameters and initialize its objects
 
         Parameters
@@ -30,6 +36,8 @@ class Manager:
             the initial configuration file
         plot : Plot
             the Plot object to use to visualize detected objects
+        plot_mode : PlotMode
+            the plotting to use
         port_attach_time : float, optional
             the time to wait to attach to the IWR6843 serial ports, by default 60.0
         queue_size : int, optional
@@ -42,6 +50,7 @@ class Manager:
         self.output_file_name = output_file_name
         self.voxels_dict: Dict[DetectedObject, DetectedObject] = {}
         self.plot = plot
+        self.plot_mode = plot_mode
         self.ports = None
         self.control = None
         self.objects_queue = Queue(queue_size)
@@ -118,12 +127,15 @@ class Manager:
         Life goin' nowhere, somebody help me, yeah
         I'm stayin' alive
         """
-        if self.run_arduino_process:
-            if not(self.iwr6843_process.is_alive()) or not(self.arduino_process.is_alive()):
-                self.reset()
-        else:
-            if not(self.iwr6843_process.is_alive()):
-                self.reset()
+        try:
+            if self.run_arduino_process:
+                if not(self.iwr6843_process.is_alive()) or not(self.arduino_process.is_alive()):
+                    self.reset()
+            else:
+                if not(self.iwr6843_process.is_alive()):
+                    self.reset()
+        except AttributeError:
+            self.reset()
 
     def yeet(self, yeet_queue: bool = True, from_sigquit: bool = False) -> None:
         """yeet yeets (kills) any child processes and yeets (deletes) any data
@@ -161,13 +173,18 @@ class Manager:
         except AttributeError:
             pass
         if from_sigquit:
+            try:
+                keyboard.unhook_all()
+                pygame.quit()
+            except:
+                pass
             Utils.dump_to_json(list(self.voxels_dict.values()), self.output_file_name)
             try:
                 del self.voxels_dict
             except AttributeError:
                 pass
 
-    def handle_detected_objects(self, detected_objects: List[DetectedObject], rotation: Tuple[int,int] = (), sort: bool = False) -> None:
+    def handle_detected_objects(self, detected_objects: List[DetectedObject], sort: bool = False) -> None:
         """handle_detected_objects handles a list of detected objects if given a rotation angle or not
 
         Parameters
@@ -216,59 +233,83 @@ class Manager:
         detected_objects = self.get_detected_objects()
 
         # Handle the detected objects
-        self.handle_detected_objects(detected_objects, self.rotation)
+        self.handle_detected_objects(detected_objects)
 
         # Draw/re-draw the plot
-        self.plot.draw(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
+        if self.plot_mode == PlotMode.PLOT_CUBES:
+            self.plot.draw(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
+        else:
+            self.plot.draw()
+
+        # Add in for drawing with the cube plot
+        if self.plot_mode == PlotMode.PLOT_CUBES:
+            self.plot.cube_list.plotCubes(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
 
         # Delete objects no longer being used
-        #del rotation
         del detected_objects
 
         return
 
     def handle_keyboard_inputs(self):
-        if keyboard.is_pressed("left"):
-            self.y_rotation = self.y_rotation - 10
-        if keyboard.is_pressed("right"):
-            self.y_rotation = self.y_rotation + 10
-        if keyboard.is_pressed("up"):
-            self.x_rotation = self.x_rotation - 10
-        if keyboard.is_pressed("down"):
-            self.x_rotation = self.x_rotation + 10
-        if keyboard.is_pressed("/"):
-            self.z_translation = self.z_translation + 10
-        if keyboard.is_pressed("Shift"):
-            self.z_translation = self.z_translation - 10
-        if keyboard.is_pressed(";"):
-            self.y_translation = self.y_translation - 10
-        if keyboard.is_pressed("\'"):
-            self.y_translation = self.y_translation + 10
-        if keyboard.is_pressed("."):
-            # resets all keys
-            self.x_rotation = 0
-            self.y_rotation = 0
-            self.z_translation = 0
-            self.y_translation = 0
+        if self.plot_mode == PlotMode.PLOT_CUBES:
+            if keyboard.is_pressed("left"):
+                self.y_rotation = self.y_rotation - 10
+            elif keyboard.is_pressed("right"):
+                self.y_rotation = self.y_rotation + 10
+            elif keyboard.is_pressed("up"):
+                self.x_rotation = self.x_rotation - 10
+            elif keyboard.is_pressed("down"):
+                self.x_rotation = self.x_rotation + 10
+            elif keyboard.is_pressed("/"):
+                self.z_translation = self.z_translation + 10
+            elif keyboard.is_pressed("Shift"):
+                self.z_translation = self.z_translation - 10
+            elif keyboard.is_pressed(";"):
+                self.y_translation = self.y_translation - 10
+            elif keyboard.is_pressed("\'"):
+                self.y_translation = self.y_translation + 10
+            elif keyboard.is_pressed("."):
+                # resets all keys
+                self.x_rotation = 0
+                self.y_rotation = 0
+                self.z_translation = 0
+                self.y_translation = 0
 
-
-    def run(self):
-        """
-        run the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and
-        keeps itself alive
-        """
-        while True:
+    def handle_pygame_events(self):
+        if self.plot_mode == PlotMode.PLOT_CUBES:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     self.yeet(from_sigquit=True)
                     exit(0)
+
+    def run(self):
+        """
+        run runs the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and
+        keeps itself alive
+        """
+        while True:
+            # Handle pygame events
+            self.handle_pygame_events()
+
+            # Handle keyboard inputs
             self.handle_keyboard_inputs()
+
+            # Parse all detected objects
             while self.detected_objects_are_present():
+                # Handle keyboard inputs
                 self.handle_keyboard_inputs()
+
+                # Run routine
                 self.routine()
-                self.plot.cube_list.plotCubes(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
-                sleep(0.1)
-            sleep(0.1)
-            #plt.pause(0.01)
+
+                # Sleep
+                sleep(0.01)
+
+            # Stay alive
             self.staying_alive()
+
+            # Sleeps/pauses
+            sleep(0.01)
+            if self.plot_mode != PlotMode.PLOT_CUBES:
+                plt.pause(0.01)

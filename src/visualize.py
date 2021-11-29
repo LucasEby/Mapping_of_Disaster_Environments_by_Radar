@@ -160,6 +160,7 @@ class Plot2D(Plot):
         if resolution is None:
             raise AttributeError("Resolution is not set of the 2D plot")
         super(Plot2D, self).__init__(resolution)
+        self.resolution = abs(resolution)
         self.eps = np.finfo(float).eps
         self.eps = (1+self.eps)*self.eps
         self.xaxis = np.arange(-5.0, 5.0, self.resolution)

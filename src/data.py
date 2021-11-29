@@ -77,9 +77,12 @@ class BytesUtils:
             the 0 or 1 value representing if a magic pattern was found in the IWR6843
         """
         found = 0
-        if (data[0] == 2 and data[1] == 1 and data[2] == 4 and data[3] == 3 and data[4] == 6 and data[5] == 5 and data[6] == 8 and data[7] == 7):
-            found = 1
-        return (found)
+        try:
+            if (data[0] == 2 and data[1] == 1 and data[2] == 4 and data[3] == 3 and data[4] == 6 and data[5] == 5 and data[6] == 8 and data[7] == 7):
+                found = 1
+        except IndexError:
+            pass
+        return found
 
 class MathUtils:
     """MathUtils are utiliites for performing calculations on recieved data
