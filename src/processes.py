@@ -89,7 +89,9 @@ class ArduinoReadProcess(Process):
         self.serial = Serial(serial_port, baudrate=baudrate, timeout=timeout)
         while True:
             if not(self.input_queue.empty()):
+                print("empty input queue")
                 input_angles = self.input_queue.get().split(" ")
+                print(input_angles[0] + " " + input_angles[1])
                 self.serial.write(bytes(input_angles[0], 'utf-8'))
                 sleep(0.5)
                 self.serial.write(bytes(input_angles[1], 'utf-8'))

@@ -1,15 +1,19 @@
-
 # Standard Library Imports
 from abc import ABC, abstractmethod
 
 # Package Imports
 import numpy as np
-import matplotlib
-matplotlib.use("TkAgg")
+# import matplotlib
+# matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 
 # Self Imports
-from data import DetectedObject
+from data import DetectedObject, DetectedObjectVoxel, MathUtils
+import pygame
+from pygame.locals import DOUBLEBUF, OPENGL
+# from OpenGL.GLU import gluPerspective
+# from cubeListCreator import CubeListCreator
+# from objectMaker import ObjectMaker
 
 class Plot(ABC):
     """Plot is a base class to plot detected objects
@@ -17,7 +21,6 @@ class Plot(ABC):
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -35,7 +38,6 @@ class Plot(ABC):
     @abstractmethod
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -48,7 +50,6 @@ class Plot3D(Plot):
     """
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -85,7 +86,6 @@ class Plot3D(Plot):
 
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -96,11 +96,56 @@ class Plot3D(Plot):
         self.zs.append(object.z)
         self.cs.append(object.snr)
 
+class PlotOpen3D(Plot):
+    def __init__(self, resolution: float = None):
+        """__init__ initialize the plot
+        Parameters
+        ----------
+        resolution : float, optional
+            the plotting resolution, by default None
+        """
+        if resolution is None:
+            raise AttributeError("Resolution is not set of the 3D plot")
+        super(PlotOpen3D, self).__init__(resolution)
+        self.xs = [0.0]
+        self.ys = [0.0]
+        self.zs = [0.0]
+        self.points = np.vstack((np.array(self.xs), np.array(self.zs), np.array(self.ys))).T
+        self.pcd = o3d.geometry.PointCloud()
+        self.pcd.points = o3d.utility.Vector3dVector(self.points)
+        self.voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pcd,voxel_size=self.resolution)
+        self.vis = o3d.visualization.Visualizer()
+        self.vis.create_window()
+        self.vis.add_geometry(self.voxel_grid)
+
+    def draw(self) -> None:
+        """draw draw/re-draw this plot
+        """
+        self.points = np.vstack((np.array(self.xs), np.array(self.zs), np.array(self.ys))).T
+        self.pcd.points = o3d.utility.Vector3dVector(self.points)
+        self.vis.remove_geometry(self.voxel_grid)
+        self.voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pcd,voxel_size=self.resolution)
+        self.vis.add_geometry(self.voxel_grid)
+        self.vis.poll_events()
+        self.vis.update_renderer()
+        sleep(0.1)
+
+    def update(self, object: DetectedObject) -> None:
+        """update update the values to plot
+        Parameters
+        ----------
+        object : DetectedObject
+            the object used to update the values
+        """
+        self.xs.append(object.x)
+        self.ys.append(object.y)
+        self.zs.append(object.z)
+
+
 class Plot2D(Plot):
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -111,8 +156,9 @@ class Plot2D(Plot):
         super(Plot2D, self).__init__(resolution)
         self.eps = np.finfo(float).eps
         self.eps = (1+self.eps)*self.eps
-        self.xaxis = np.arange(-10.0, 10.0, self.resolution)
-        self.zaxis = np.arange(-10.0, 10.0, self.resolution)
+        self.xaxis = np.arange(-5.0, 5.0, self.resolution)
+        self.zaxis = np.arange(-5.0, 5.0, self.resolution)
+        self.ys = []
         self.grid = np.zeros((max(self.xaxis.shape), max(self.zaxis.shape)))
         self.fig = plt.figure()
         self.fig_num = plt.gcf().number
@@ -121,6 +167,7 @@ class Plot2D(Plot):
         plt.ylabel("Z Axis (m)")
         plt.title("Range Map")
         self.cbar = plt.colorbar()
+        plt.clim(0.0, 5.0)
         self.cbar.ax.set_ylabel("Range (m)")
 
     def draw(self) -> None:
@@ -132,7 +179,6 @@ class Plot2D(Plot):
 
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -146,5 +192,44 @@ class Plot2D(Plot):
         if len(xloc) > 0 and len(zloc) > 0:
             xloc = xloc[0]
             zloc = zloc[0]
-            self.grid[xloc,zloc] = y
-        plt.clim(np.min(self.grid), np.max(self.grid))
+            try:
+                self.grid[xloc,zloc] = y
+                self.ys.append(y)
+            except IndexError:
+                pass
+
+class PlotCubes(Plot):
+    def __init__(self, resolution: float = None):
+        """__init__ initialize the plot
+        Parameters
+        ----------
+        resolution : float, optional
+            the plotting resolution, by default None
+        """
+        super(PlotCubes, self).__init__(resolution)
+        self.cube_list = CubeListCreator()
+        self.maker = ObjectMaker(self.cube_list, 0, 0, 0, 0, self.resolution)
+        self.x_rotation = 0
+        self.y_rotation = 0
+        pygame.init()
+        display = (800, 600)
+        pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
+        pygame.display.toggle_fullscreen()
+        gluPerspective(45, (display[0] / display[1]), 1, 1000.0)
+
+    def draw(self, x_rotation , y_rotation, z_translation, y_translation) -> None:
+        """draw draw/re-draw this plot
+        """
+        self.cube_list.plotCubes(x_rotation, y_rotation, z_translation, y_translation)
+
+    def update(self, object: DetectedObjectVoxel) -> None:
+        """update update the values to plot
+        Parameters
+        ----------
+        object : DetectedObject
+            the object used to update the values
+        """
+        azimuth = 90.0+ MathUtils.get_azimuth(object.x, object.z)
+        if object.z >= 0.0:
+            # self.maker.add_new_point(object.x, object.y, -50*object.z, azimuth, True)
+            self.maker.add_new_point(50*object.x, 50*object.y, -50*object.z, azimuth, True)
