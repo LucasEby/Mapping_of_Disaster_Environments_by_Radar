@@ -91,7 +91,7 @@ class Ports:
                 if timer:
                     timer.run()
                 # Set class data
-                if not(cli_path is None) and not(data_path is None) and (not(arduino_path is None) or not(find_arduino)):
+                if not(cli_path is None) and not(data_path is None) and (not(arduino_path is None) or (not(find_arduino))):
                     # Attach to ports
                     if attach_to_ports:
                         self.cli_port = Serial(cli_path, 115200, timeout=0.1)

@@ -1,4 +1,3 @@
-
 # Standard Library Imports
 from abc import ABC, abstractmethod
 from time import sleep
@@ -22,7 +21,6 @@ class Plot(ABC):
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -40,7 +38,6 @@ class Plot(ABC):
     @abstractmethod
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -53,7 +50,6 @@ class Plot3D(Plot):
     """
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -90,7 +86,6 @@ class Plot3D(Plot):
 
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -153,7 +148,6 @@ class Plot2D(Plot):
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -188,7 +182,6 @@ class Plot2D(Plot):
 
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -225,7 +218,6 @@ class PlotCubes(Plot):
         pygame.init()
         display = (800, 600)
         pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-        pygame.display.toggle_fullscreen()
         gluPerspective(45, (display[0] / display[1]), 1, 1000.0)
 
     def draw(self, x_rotation, y_rotation, z_translation, y_translation) -> None:
@@ -243,5 +235,4 @@ class PlotCubes(Plot):
         """
         azimuth = 90.0 + MathUtils.get_azimuth(object.x, object.z)
         if object.z >= 0.0:
-            # self.maker.add_new_point(object.x, object.y, -50*object.z, azimuth, True)
             self.maker.add_new_point(50*object.x, 50*object.y, -50*object.z, azimuth, True)
