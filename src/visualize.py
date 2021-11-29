@@ -225,7 +225,7 @@ class PlotCubes(Plot):
         pygame.init()
         display = (800, 600)
         pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-        pygame.display.toggle_fullscreen()
+        # pygame.display.toggle_fullscreen()
         gluPerspective(45, (display[0] / display[1]), 1, 1000.0)
 
     def draw(self, x_rotation, y_rotation, z_translation, y_translation) -> None:
