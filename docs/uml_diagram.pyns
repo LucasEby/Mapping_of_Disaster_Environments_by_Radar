@@ -1,0 +1,63 @@
+# PynSource Version 1.2
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin. Comments are saved.'}
+{'type':'umlshape', 'id':'ParserStatus', 'x':420, 'y':150, 'width':111, 'height':64, 'attrs': 'TC_FAIL|TC_PASS', 'meths': ''}
+{'type':'umlshape', 'id':'BytesUtils', 'x':551, 'y':44, 'width':124, 'height':74, 'attrs': '', 'meths': 'check_magic_pattern|get_uint16|get_uint32'}
+{'type':'umlshape', 'id':'MathUtils', 'x':606, 'y':138, 'width':148, 'height':124, 'attrs': 'ONEHUNDRENDEIGHTYOVERPI|Y_OFF', 'meths': 'b_to_d_rotation|get_azimuth|get_elev_angle|get_range|radians_to_degrees'}
+{'type':'umlshape', 'id':'Utils', 'x':789, 'y':125, 'width':112, 'height':104, 'attrs': '', 'meths': 'create_csv|dump_json_default|dump_to_json|len_safe|open_json|write_row_csv'}
+{'type':'umlshape', 'id':'PacketInfo', 'x':572, 'y':303, 'width':148, 'height':144, 'attrs': 'frame_number|header_start_index|number_detected_objects|number_tlv|packet_length|sub_frame_number|time_cpu_cycles|time_cpu_cylces', 'meths': '__init__'}
+{'type':'umlshape', 'id':'DetectedObject', 'x':1186, 'y':68, 'width':128, 'height':184, 'attrs': 'azimuth|computed_range|elev_angle|noise|snr|v|x|y|z', 'meths': '__init__|__repr__|tlv_type_1|tlv_type_7'}
+{'type':'umlshape', 'id':'DetectedObjectVoxel', 'x':1201, 'y':386, 'width':170, 'height':184, 'attrs': 'OBJECT_THRESHOLD|hits|is_object|resolution|x|y|z', 'meths': '__eq__|__hash__|__init__|_round_pos|_round_pos_to_res|visit'}
+{'type':'umlshape', 'id':'PacketHandler', 'x':412, 'y':311, 'width':119, 'height':124, 'attrs': 'HEADER_BYTE_SIZE|OBJECT', 'meths': '__init__|_get_status|_parse_packet_info|_parse_tlvs|parser'}
+{'type':'umlshape', 'id':'Reader', 'x':321, 'y':261, 'width':64, 'height':94, 'attrs': 'data_port|parser', 'meths': '__init__|read'}
+{'type':'umlshape', 'id':'Ports', 'x':222, 'y':133, 'width':82, 'height':104, 'attrs': 'SERIAL_CODE|arduino_port|cli_port|data_port', 'meths': '__init__'}
+{'type':'umlshape', 'id':'Serial', 'x':189, 'y':526, 'width':60, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'Manager', 'x':752, 'y':289, 'width':178, 'height':274, 'attrs': 'angles_queue|arduino_process|config_file_name|control|iwr6843_process|objects_queue|output_file_name|plot|port_attach_time|ports|run_arduino_process|voxels_dict', 'meths': '__init__|detected_objects_are_present|get_detected_objects|get_servo_angle|handle_detected_objects|reset|routine|run|staying_alive|yeet'}
+{'type':'umlshape', 'id':'Queue', 'x':572, 'y':564, 'width':52, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'ArduinoReadProcess', 'x':524, 'y':716, 'width':161, 'height':104, 'attrs': 'queue|serial|target', 'meths': '__init__|read_serial'}
+{'type':'umlshape', 'id':'Control', 'x':153, 'y':670, 'width':226, 'height':454, 'attrs': 'adc_buf_cfg|adc_cfg|adv_frame_cfg|analog_monitor|aoa_fov_cfg|bpm_cfg|calib_data|calib_dc_range_sig|cfar_cfg|cfar_fov_cfg|channel_cfg|chirp_cfg|cli_port|clutter_removal|comp_range_bias_and_rx_chan_phase|config_data_port|configs|cq_rx_sat_monitor|cq_sig_img_monitor|dfe_data_output_mode|extended_max_velocity|flush_cfg|frame_cfg|gui_monitor|init_config_file|low_power|lvds_stream_cfg|measure_range_bias_and_rx_chan_phase|multi_obj_beam_forming|profile_cfg|query_demo_status|sensor_start|sensor_stop|sub_frame_cfg', 'meths': '__init__|_init_configuration|_setup_configs|config|read|write'}
+{'type':'umlshape', 'id':'Plot', 'x':1043, 'y':351, 'width':70, 'height':94, 'attrs': 'resolution', 'meths': '__init__|draw|update'}
+{'type':'umlshape', 'id':'IWR6843ReadProcess', 'x':382, 'y':474, 'width':161, 'height':114, 'attrs': 'parser|queue|serial|target', 'meths': '__init__|read_serial'}
+{'type':'umlshape', 'id':'Process', 'x':489, 'y':618, 'width':69, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'Plot3D', 'x':994, 'y':485, 'width':60, 'height':154, 'attrs': 'axis|cs|fig|sp|xs|ys|zs', 'meths': '__init__|draw|update'}
+{'type':'umlshape', 'id':'Plot2D', 'x':1102, 'y':482, 'width':60, 'height':154, 'attrs': 'cbar|eps|fig|fig_num|grid|xaxis|zaxis', 'meths': '__init__|draw|update'}
+{'type':'umlshape', 'id':'ABC', 'x':1079, 'y':289, 'width':35, 'height':24, 'attrs': '', 'meths': ''}
+{'type':'umlshape', 'id':'Config', 'x':19, 'y':855, 'width':88, 'height':274, 'attrs': 'command|enabled|input|mask|n_inputs|need_reboot|no_value|prev_index|prev_values|stop_start|validator|value|values', 'meths': '__eq__|__hash__|__init__|__repr__|get_cmd|get_value|set_and_write|set_value|write'}
+{'type':'umlshape', 'id':'TimeOutException', 'x':52, 'y':314, 'width':144, 'height':74, 'attrs': 'message', 'meths': '__init__'}
+{'type':'umlshape', 'id':'Timer', 'x':78, 'y':130, 'width':88, 'height':124, 'attrs': 'end|error_message|start|timeout', 'meths': '__init__|run|time'}
+{'type':'edge', 'id':'DetectedObjectVoxel_to_DetectedObject', 'source':'DetectedObjectVoxel', 'target':'DetectedObject', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'Ports_to_Reader', 'source':'Ports', 'target':'Reader', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'PacketInfo_to_PacketHandler', 'source':'PacketInfo', 'target':'PacketHandler', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Serial_to_Reader', 'source':'Serial', 'target':'Reader', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'PacketHandler_to_Reader', 'source':'PacketHandler', 'target':'Reader', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Queue_to_Manager', 'source':'Queue', 'target':'Manager', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Ports_to_Manager', 'source':'Ports', 'target':'Manager', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'ArduinoReadProcess_to_Manager', 'source':'ArduinoReadProcess', 'target':'Manager', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Control_to_Manager', 'source':'Control', 'target':'Manager', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Plot_to_Manager', 'source':'Plot', 'target':'Manager', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'IWR6843ReadProcess_to_Manager', 'source':'IWR6843ReadProcess', 'target':'Manager', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'ArduinoReadProcess_to_Process', 'source':'ArduinoReadProcess', 'target':'Process', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'IWR6843ReadProcess_to_Process', 'source':'IWR6843ReadProcess', 'target':'Process', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'Serial_to_IWR6843ReadProcess', 'source':'Serial', 'target':'IWR6843ReadProcess', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Queue_to_ArduinoReadProcess', 'source':'Queue', 'target':'ArduinoReadProcess', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'PacketHandler_to_IWR6843ReadProcess', 'source':'PacketHandler', 'target':'IWR6843ReadProcess', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Queue_to_IWR6843ReadProcess', 'source':'Queue', 'target':'IWR6843ReadProcess', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Serial_to_ArduinoReadProcess', 'source':'Serial', 'target':'ArduinoReadProcess', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Plot3D_to_Plot', 'source':'Plot3D', 'target':'Plot', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'Plot_to_ABC', 'source':'Plot', 'target':'ABC', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'Plot2D_to_Plot', 'source':'Plot2D', 'target':'Plot', 'uml_edge_type': 'generalisation'}
+{'type':'edge', 'id':'DetectedObject_to_Plot2D', 'source':'DetectedObject', 'target':'Plot2D', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'DetectedObject_to_Plot3D', 'source':'DetectedObject', 'target':'Plot3D', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'DetectedObject_to_Plot', 'source':'DetectedObject', 'target':'Plot', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Config_to_Control', 'source':'Config', 'target':'Control', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Control_to_Config', 'source':'Control', 'target':'Config', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Serial_to_Ports', 'source':'Serial', 'target':'Ports', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Ports_to_Control', 'source':'Ports', 'target':'Control', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Serial_to_Control', 'source':'Serial', 'target':'Control', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'TimeOutException_to_Timer', 'source':'TimeOutException', 'target':'Timer', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'ParserStatus_to_PacketHandler', 'source':'ParserStatus', 'target':'PacketHandler', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Timer_to_Ports', 'source':'Timer', 'target':'Ports', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'MathUtils_to_PacketHandler', 'source':'MathUtils', 'target':'PacketHandler', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'BytesUtils_to_PacketHandler', 'source':'BytesUtils', 'target':'PacketHandler', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'Utils_to_Manager', 'source':'Utils', 'target':'Manager', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'DetectedObject_to_PacketHandler', 'source':'DetectedObject', 'target':'PacketHandler', 'uml_edge_type': 'composition'}
+{'type':'edge', 'id':'DetectedObject_to_Manager', 'source':'DetectedObject', 'target':'Manager', 'uml_edge_type': 'composition'}
