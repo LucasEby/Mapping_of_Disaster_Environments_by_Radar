@@ -3,6 +3,8 @@ from control import Ports, Control
 from data import DetectedObject, DetectedObjectVoxel, MathUtils, Utils, compare_detected_object_voxels
 from processes import IWR6843ReadProcess, ArduinoReadProcess
 from visualize import Plot
+# from page_control import PageControlProcess
+from page_matplotlib import PageMatplotlib
 
 # Standard Library Imports
 from multiprocessing import Queue
@@ -56,8 +58,11 @@ class Manager:
         self.objects_queue = Queue(queue_size)
         self.iwr6843_process = None
         if self.run_arduino_process:
+            self.input_angles_queue = Queue(1)  # TODO: my edits
             self.angles_queue = Queue(1)
             self.arduino_process = None
+            # self.page_control: PageControlProcess = PageControlProcess(self.input_angles_queue)
+            self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
         self.reset()
         self.x_rotation = 0
         self.y_rotation = 0
@@ -71,12 +76,14 @@ class Manager:
         self.ports = Ports(attach_time=self.port_attach_time, attach_to_ports=False, find_arduino=self.run_arduino_process)
         self.iwr6843_process = IWR6843ReadProcess(self.objects_queue, self.ports.data_port, 921600, 0.1)
         if self.run_arduino_process:
-            self.arduino_process = ArduinoReadProcess(self.angles_queue, self.ports.arduino_port, 9600, 0.1)
+            self.arduino_process = ArduinoReadProcess(self.input_angles_queue, self.angles_queue, self.ports.arduino_port, 9600, 1)
         self.control = Control(self.config_file_name, self.ports)
         sleep(0.1)
         self.iwr6843_process.start()
         if self.run_arduino_process:
             self.arduino_process.start()
+            # self.page_control.run()
+            self.input_page.start()
 
     def get_servo_angle(self) -> Tuple[int,int]:
         """get_servo_angle get the angle of the servo
@@ -288,6 +295,9 @@ class Manager:
         run runs the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and
         keeps itself alive
         """
+        # self.page_control.start_page()   # TODO:
+        # self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
+        # self.input_page.start()
         while True:
             # Handle pygame events
             self.handle_pygame_events()

@@ -1,10 +1,11 @@
-
 # Standard Library Imports
 from abc import ABC, abstractmethod
 from time import sleep
 
 # Package Imports
 import numpy as np
+# import matplotlib
+# matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
@@ -22,7 +23,6 @@ class Plot(ABC):
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -40,7 +40,6 @@ class Plot(ABC):
     @abstractmethod
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -53,7 +52,6 @@ class Plot3D(Plot):
     """
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -90,7 +88,6 @@ class Plot3D(Plot):
 
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
@@ -104,7 +101,10 @@ class Plot3D(Plot):
 class PlotOpen3D(Plot):
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/myBranch
         Parameters
         ----------
         resolution : float, optional
@@ -138,7 +138,10 @@ class PlotOpen3D(Plot):
 
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/myBranch
         Parameters
         ----------
         object : DetectedObject
@@ -153,7 +156,6 @@ class Plot2D(Plot):
 
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
-
         Parameters
         ----------
         resolution : float, optional
@@ -188,7 +190,6 @@ class Plot2D(Plot):
 
     def update(self, object: DetectedObject) -> None:
         """update update the values to plot
-
         Parameters
         ----------
         object : DetectedObject
