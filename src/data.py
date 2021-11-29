@@ -180,9 +180,27 @@ class MathUtils:
             return cls.radians_to_degrees(atan(z/sqrt((x**2)+(y**2))))
 
     @classmethod
-    def b_to_d_rotation(cls, x: float, y: float, z: float, h: int, v: int) -> Tuple[float, float, float]:
-        # h = h - 115
-        # v = -(v - 180)
+    def b_to_d_rotation(cls, x: float, y: float, z: float, h: float, v: float) -> Tuple[float, float, float]:
+        """b_to_d_rotation performs rotation of coordinates horizontally and vertically
+
+        Parameters
+        ----------
+        x : float
+            the x-coordinate
+        y : float
+            the y-coordinate
+        z : float
+            the z-coordinate
+        h : float
+            the horizontal angle of rotation
+        v : float
+            the vertical angle of rotation
+
+        Returns
+        -------
+        Tuple[float, float, float]
+            the rotated x, y, and z coordinates
+        """
         rotated_x = \
             (x * cos(h)) + \
             (sin(h) * cos(v) * (cls.Y_OFF - y)) + \
@@ -199,6 +217,7 @@ class MathUtils:
 class Utils:
     """Utils are a set of more generic utilities needed for this program and handling data
     """
+
     @classmethod
     def dump_json_default(cls, obj: Any) -> Union[Dict, str]:
         """dump_json_default default function that dumps an object to a json format
@@ -429,9 +448,6 @@ class DetectedObject:
         self.snr = snr
         self.noise = noise
         return
-
-    def __repr__(self):
-        return f"{self.x},{self.y},{self.z}"
 
 class DetectedObjectVoxel(DetectedObject):
     """DetectedObjectVoxel DetectedObjectVoxel stores info on a detected object parsed from a packet from the IWR6843 as well as functioning as a voxel

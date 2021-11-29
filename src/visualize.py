@@ -1,18 +1,20 @@
 
 # Standard Library Imports
 from abc import ABC, abstractmethod
+from time import sleep
 
 # Package Imports
 import numpy as np
 import matplotlib.pyplot as plt
-
-# Self Imports
-from data import DetectedObject, DetectedObjectVoxel, MathUtils
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
 from OpenGL.GLU import gluPerspective
-from cubeListCreator import CubeListCreator
-from objectMaker import ObjectMaker
+import open3d as o3d
+
+# Self Imports
+from data import DetectedObject, DetectedObjectVoxel, MathUtils
+from cube_list_creator import CubeListCreator
+from object_maker import ObjectMaker
 
 class Plot(ABC):
     """Plot is a base class to plot detected objects
@@ -226,10 +228,10 @@ class PlotCubes(Plot):
         pygame.display.toggle_fullscreen()
         gluPerspective(45, (display[0] / display[1]), 1, 1000.0)
 
-    def draw(self, x_rotation , y_rotation, z_translation, y_translation) -> None:
+    def draw(self, x_rotation, y_rotation, z_translation, y_translation) -> None:
         """draw draw/re-draw this plot
         """
-        self.cube_list.plotCubes(x_rotation, y_rotation, z_translation, y_translation)
+        self.cube_list.plot_cubes(x_rotation, y_rotation, z_translation, y_translation)
 
     def update(self, object: DetectedObjectVoxel) -> None:
         """update update the values to plot
@@ -239,7 +241,7 @@ class PlotCubes(Plot):
         object : DetectedObject
             the object used to update the values
         """
-        azimuth = 90.0+ MathUtils.get_azimuth(object.x, object.z)
+        azimuth = 90.0 + MathUtils.get_azimuth(object.x, object.z)
         if object.z >= 0.0:
             # self.maker.add_new_point(object.x, object.y, -50*object.z, azimuth, True)
             self.maker.add_new_point(50*object.x, 50*object.y, -50*object.z, azimuth, True)

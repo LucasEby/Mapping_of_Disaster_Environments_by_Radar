@@ -9,7 +9,7 @@ import argparse
 from typing import Tuple
 
 # Package Imports
-import pygame
+None
 
 # Define signal handler
 def signal_handler(sig, frame, manager: Manager = None):
@@ -63,6 +63,7 @@ def main():
 
     # Run the manager
     manager.run()
+
 
 if __name__ == '__main__':
     main()

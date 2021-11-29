@@ -1,6 +1,5 @@
 class CubeComponents:
-    """
-    Stores the common data for each of the cube points.
+    """CubeComponents Stores the common data for each of the cube points.
     """
 
     # These are the edges that make up a cube.

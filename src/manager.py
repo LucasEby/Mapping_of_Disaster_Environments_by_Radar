@@ -10,12 +10,12 @@ from time import sleep
 from typing import Tuple, List, Dict
 from functools import cmp_to_key
 from enum import Enum
+import keyboard
+from sys import exit
 
 # Package Imports
 import matplotlib.pyplot as plt
 import pygame
-import keyboard
-from sys import exit
 
 class PlotMode(Enum):
     NONE = 0
@@ -243,7 +243,7 @@ class Manager:
 
         # Add in for drawing with the cube plot
         if self.plot_mode == PlotMode.PLOT_CUBES:
-            self.plot.cube_list.plotCubes(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
+            self.plot.cube_list.plot_cubes(self.x_rotation, self.y_rotation, self.z_translation, self.y_translation)
 
         # Delete objects no longer being used
         del detected_objects

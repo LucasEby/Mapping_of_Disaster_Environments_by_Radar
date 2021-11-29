@@ -1,8 +1,16 @@
-from cubeComponents import CubeComponents
-from OpenGL.GL import glBegin, GL_QUADS, glColor, glColor3fv, glVertex, glEnd, GL_LINES, glVertex3fv
+# Package Imports
+from OpenGL.GL import glBegin, GL_QUADS, glColor3fv, glVertex, glEnd, GL_LINES, glVertex3fv
 
+# Self Imports
+from cube_components import CubeComponents
+
+# Standard Library Imports
+None
 
 class Cube:
+    """ [summary]
+    """
+
     def __init__(self, x, y, z, color, half_x_length=0.5, half_y_length=0.5, half_z_length=0.5):
         """
         Stores the data for each of the cube points. These cubes, depending on the parameters passed, can technically
@@ -77,7 +85,7 @@ class Cube:
             (-self.half_x_length, self.half_y_length, self.half_z_length)
         )
 
-    def drawCube(self, new_vertices) -> None:
+    def draw_cube(self, new_vertices) -> None:
         """
         This class is used to plot the cube in its correct position and color.
         :param new_vertices: the positions of the vertices that are being plotted.
@@ -96,8 +104,6 @@ class Cube:
             for vertex in edge:
                 glVertex3fv(new_vertices[vertex])
         glEnd()
-        #load identitty matrix
-        # gl load identity
 
     def get_data(self) -> [float, float, float, float, float, float, float]:
         """

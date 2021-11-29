@@ -39,15 +39,13 @@ class Ports:
     """Ports stores the serial ports used to communicate with the IWR6843 chip
     """
 
-    # SERIAL_CODE = "SER=00CF6C84"
-    # SERIAL_CODE = "SER=00CF6AE9"
     SERIAL_CODE = "SER=00CF6"
     cli_port: Union[str, Serial]
     data_port: Union[str, Serial]
     arduino_port: Union[str, Serial]
 
     def __init__(self, attach_time: float = None, attach_to_ports: bool = True, find_arduino: bool = False):
-        """__init__ [summary]
+        """__init__ looks for the serial ports of the arduino if specified and the IWR6843 and attaches to the ports if specified
 
         Parameters
         ----------
