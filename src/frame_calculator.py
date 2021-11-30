@@ -17,7 +17,7 @@ class FrameCalculator:
         """
         # This variable represents the offset of the radar board in the y direction (the y direction is in reference
         # to the board's reference frame, which has the y axis pointing in the direction of the radar signal).
-        self.__y_off = 1
+        self.__y_off = 0  # 31.21 / 1000.0
 
     def b_to_d_rotation(self, x, y, z, h_angle, v_angle) -> [float, float, float]:
         """
@@ -31,8 +31,8 @@ class FrameCalculator:
         """
         # v_servo origin is 180 degrees
         # h_servo origin is 115 degrees.
-        h_angle = h_angle - 115
-        v_angle = -(v_angle - 180)
+        # h_angle = h_angle - 115
+        # v_angle = -(v_angle - 180)
 
         rotated_x = x * math.cos(h_angle) + math.sin(h_angle) * math.cos(v_angle) * (self.__y_off - y) \
             + math.sin(h_angle) * math.sin(v_angle) * z

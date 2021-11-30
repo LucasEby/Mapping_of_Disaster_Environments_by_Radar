@@ -132,35 +132,48 @@ class ObjectMaker:
         :param is_object: a boolean representing whether or not this object has neighbors
         :return: nothing
         """
-        if is_object:
-            # if not (self.__check_and_update_x(x) or self.__check_and_update_y(y) or self.__check_and_update_z(z)):
-            # this new point is for a new object. We need to send the old object to the cubeListCreator
-            # before we store this new point to check it against future points.
-            # We can make this assumption because the objects that are received here are sorted by distance from
-            # one another.
-            half_x_length = (self.__x_max - self.__x_min) / 2
-            half_y_length = (self.__y_max - self.__y_min) / 2
-            half_z_length = (self.__z_max - self.__z_min) / 2
-            if half_x_length == 0:
-                half_x_length = 0.5
-            if half_y_length == 0:
-                half_y_length = 0.5
-            if half_z_length == 0:
-                half_z_length = 0.5
-            x_pos = self.__x_min + half_x_length
-            y_pos = self.__y_min + half_y_length
-            z_pos = self.__z_min + half_z_length
-            color_index = self.__calc_color(((self.__angle_max - self.__angle_min) / 2) + self.__angle_min)
+        # if is_object:
+        # if not (self.__check_and_update_x(x) or self.__check_and_update_y(y) or self.__check_and_update_z(z)):
+        # this new point is for a new object. We need to send the old object to the cubeListCreator
+        # before we store this new point to check it against future points.
+        # We can make this assumption because the objects that are received here are sorted by distance from
+        # one another.
+        half_x_length = (self.__x_max - self.__x_min) / 2
+        half_y_length = (self.__y_max - self.__y_min) / 2
+        half_z_length = (self.__z_max - self.__z_min) / 2
+        if half_x_length == 0:
+            half_x_length = 0.5
+        if half_y_length == 0:
+            half_y_length = 0.5
+        if half_z_length == 0:
+            half_z_length = 0.5
+        x_pos = self.__x_min + half_x_length
+        y_pos = self.__y_min + half_y_length
+        z_pos = self.__z_min + half_z_length
+        # color_index = self.__calc_color(((self.__angle_max - self.__angle_min) / 2) + self.__angle_min)
+        # color_index: int = math.floor((math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)) % 1530)
+        color_index = z_pos*715.0
+        color_index = int(round(color_index))
+        # if color_index > 1530:
+        #    color_index = 715
+        # 1000 * 50
 
-            # print("x_pos: " + str(x_pos) + " half_x_length: " + str(half_x_length))
-            # print("y_pos: " + str(y_pos) + " half_y_length: " + str(half_y_length))
-            # print("z_pos: " + str(z_pos) + " half_z_length: " + str(half_z_length))
-            self.__list_creator.add_new_cube(Cube(x_pos, y_pos, z_pos, color_index,
-                                                  half_x_length, half_y_length, half_z_length))
-            # set x, y, and z parameters to be the new object in consideration:
-            self.__x_min = self.__x_max = x
-            self.__y_min = self.__y_max = y
-            self.__z_min = self.__z_max = z
-            self.__angle_min = self.__angle_max = horizontal_angle
-            # else:
-            #    self.__update_angle(horizontal_angle)
+        # to make bigger:
+        half_x_length = half_x_length * 5.0
+        half_y_length = half_y_length * 5.0
+        half_z_length = half_z_length * 5.0
+
+        # print("x_pos: " + str(x_pos) + " half_x_length: " + str(half_x_length))
+        # print("y_pos: " + str(y_pos) + " half_y_length: " + str(half_y_length))
+        # print("z_pos: " + str(z_pos) + " half_z_length: " + str(half_z_length))
+        # correct:
+        # self.__list_creator.add_new_cube(Cube(x_pos, y_pos, z_pos, color_index, half_x_length, half_y_length, half_z_length))
+        self.__list_creator.add_new_cube(
+            Cube(50.0 * x_pos, 50.0 * y_pos, 50.0 * z_pos, color_index, half_x_length, half_y_length, half_z_length))
+        # set x, y, and z parameters to be the new object in consideration:
+        self.__x_min = self.__x_max = x
+        self.__y_min = self.__y_max = y
+        self.__z_min = self.__z_max = z
+        self.__angle_min = self.__angle_max = horizontal_angle
+        # else:
+        #    self.__update_angle(horizontal_angle)

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
 from OpenGL.GLU import gluPerspective
-import open3d as o3d
+#import open3d as o3d
 
 # Self Imports
 from data import DetectedObject, DetectedObjectVoxel, MathUtils
@@ -45,6 +45,7 @@ class Plot(ABC):
             the object used to update the values
         """
         pass
+
 
 class Plot3D(Plot):
     """Plot3D is a helper class to plot detected objects
@@ -96,54 +97,6 @@ class Plot3D(Plot):
         self.ys.append(object.y)
         self.zs.append(object.z)
         self.cs.append(object.snr)
-
-class PlotOpen3D(Plot):
-    def __init__(self, resolution: float = None):
-        """__init__ initialize the plot
-
-        Parameters
-        ----------
-        resolution : float, optional
-            the plotting resolution, by default None
-        """
-        if resolution is None:
-            raise AttributeError("Resolution is not set of the 3D plot")
-        super(PlotOpen3D, self).__init__(resolution)
-        self.xs = [0.0]
-        self.ys = [0.0]
-        self.zs = [0.0]
-        self.points = np.vstack((np.array(self.xs), np.array(self.zs), np.array(self.ys))).T
-        self.pcd = o3d.geometry.PointCloud()
-        self.pcd.points = o3d.utility.Vector3dVector(self.points)
-        self.voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pcd,voxel_size=self.resolution)
-        self.vis = o3d.visualization.Visualizer()
-        self.vis.create_window()
-        self.vis.add_geometry(self.voxel_grid)
-
-    def draw(self) -> None:
-        """draw draw/re-draw this plot
-        """
-        self.points = np.vstack((np.array(self.xs), np.array(self.zs), np.array(self.ys))).T
-        self.pcd.points = o3d.utility.Vector3dVector(self.points)
-        self.vis.remove_geometry(self.voxel_grid)
-        self.voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.pcd,voxel_size=self.resolution)
-        self.vis.add_geometry(self.voxel_grid)
-        self.vis.poll_events()
-        self.vis.update_renderer()
-        sleep(0.1)
-
-    def update(self, object: DetectedObject) -> None:
-        """update update the values to plot
-
-        Parameters
-        ----------
-        object : DetectedObject
-            the object used to update the values
-        """
-        self.xs.append(object.x)
-        self.ys.append(object.y)
-        self.zs.append(object.z)
-
 
 class Plot2D(Plot):
 
@@ -240,4 +193,4 @@ class PlotCubes(Plot):
         """
         azimuth = 90.0 + MathUtils.get_azimuth(object.x, object.z)
         if object.z >= 0.0:
-            self.maker.add_new_point(50*object.x, 50*object.y, -50*object.z, azimuth, True)
+            self.maker.add_new_point(object.x, object.y, object.z, azimuth, True)

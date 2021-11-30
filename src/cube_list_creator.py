@@ -3,7 +3,8 @@ import json
 
 # Package Imports
 import pygame
-from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, glRotatef, glPushMatrix, glPopMatrix, glTranslatef
+from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, glRotatef, glPushMatrix, glPopMatrix, \
+    glTranslatef, glWindowPos2d, glDrawPixels, GL_RGBA, GL_UNSIGNED_BYTE
 
 # Self Imports
 from cube import Cube
@@ -22,7 +23,7 @@ class CubeListCreator:
         self.__vertical_rotation = 0
         self.__all_real_points = False
         self.__index_pos = 0
-        self.__list_length = 100
+        self.__list_length = 10000
         self.__cube_list = []
 
         # Place fake objects in list:
@@ -54,11 +55,63 @@ class CubeListCreator:
         :return: nothing
         """
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        # draw origin:
         glPushMatrix()
         glTranslatef(0, 0, z_translation)
         glRotatef(x_rotation, 1, 0, 0)
         glRotatef(y_rotation, 0, 1, 0)
         glTranslatef(0, y_translation, 0)
+        cube0 = Cube(0, 0, 10, 700, 1, 1, 1)
+        glTranslatef(0, 0, -10)
+        cube0.draw_origin(cube0.set_vertices())
+        glPopMatrix()
+
+        # Rotate without translation:
+        glPushMatrix()
+        glTranslatef(0, 0, z_translation)
+        glRotatef(x_rotation, 1, 0, 0)
+        glRotatef(y_rotation, 0, 1, 0)
+        glTranslatef(0, y_translation, 0)
+        glRotatef(180, 0, 1, 0)
+
+        # z axis:
+        cube1 = Cube(0, 0, 2, 200, 1, 1, 1)
+        cube1.draw_cube(cube1.set_vertices())
+        cube2 = Cube(0, 0, 4, 700, 1, 1, 1)
+        cube2.draw_origin(cube2.set_vertices())
+        cube3 = Cube(0, 0, 6, 200, 1, 1, 1)
+        cube3.draw_cube(cube3.set_vertices())
+        cube12 = Cube(0, 0, 8, 700, 1, 1, 1)
+        cube12.draw_origin(cube12.set_vertices())
+
+        # x axis:
+        cube4 = Cube(2, 0, 0, 1100, 1, 1, 1)
+        cube4.draw_cube(cube4.set_vertices())
+        cube5 = Cube(4, 0, 0, 700, 1, 1, 1)
+        cube5.draw_origin(cube5.set_vertices())
+        cube6 = Cube(6, 0, 0, 1100, 1, 1, 1)
+        cube6.draw_cube(cube6.set_vertices())
+        cube11 = Cube(8, 0, 0, 700, 1, 1, 1)
+        cube11.draw_origin(cube11.set_vertices())
+
+        # y axis:
+        cube7 = Cube(0, 2, 0, 700, 1, 1, 1)
+        cube7.draw_cube(cube7.set_vertices())
+        cube8 = Cube(0, 4, 0, 700, 1, 1, 1)
+        cube8.draw_origin(cube8.set_vertices())
+        cube9 = Cube(0, 6, 0, 700, 1, 1, 1)
+        cube9.draw_cube(cube9.set_vertices())
+        cube10 = Cube(0, 8, 0, 700, 1, 1, 1)
+        cube10.draw_origin(cube10.set_vertices())
+        # glPopMatrix()
+
+        # Plot cubes:
+        # glPushMatrix()
+        # glTranslatef(0, 0, z_translation)
+        # glRotatef(x_rotation, 1, 0, 0)
+        # glRotatef(y_rotation, 0, 1, 0)
+        # glTranslatef(0, y_translation, 0)
 
         if self.__all_real_points:
             for each_cube in self.__cube_list:
@@ -66,8 +119,17 @@ class CubeListCreator:
         else:
             for index in range(self.__index_pos):
                 self.__cube_list[index].draw_cube(self.__cube_list[index].set_vertices())
+        # self.drawText(0, 0, "I like bananas")
         pygame.display.flip()  # .update() doesn't work here for some reason
         glPopMatrix()
+
+    #def drawText(self, x, y, text):
+    #    font = pygame.font.SysFont('arial', 64)
+    #    textSurface = font.render(text, True, (255, 0, 0, 255), (0, 66, 0, 255)).convert_alpha()
+    #    textSurface.set_alpha(127)
+    #    textData = pygame.image.tostring(textSurface, "RGBA", True)
+    #    glWindowPos2d(x, y)
+    #    glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
     def size(self) -> int:
         """
