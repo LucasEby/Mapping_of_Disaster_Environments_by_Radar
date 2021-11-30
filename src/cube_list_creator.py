@@ -10,6 +10,7 @@ from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, glRotat
 from cube import Cube
 from frame_calculator import FrameCalculator
 
+
 class CubeListCreator:
     """ [summary]
     """
@@ -73,16 +74,16 @@ class CubeListCreator:
         glRotatef(x_rotation, 1, 0, 0)
         glRotatef(y_rotation, 0, 1, 0)
         glTranslatef(0, y_translation, 0)
-        glRotatef(180, 0, 1, 0)
+        # glRotatef(180, 0, 1, 0)
 
         # z axis:
-        cube1 = Cube(0, 0, 2, 200, 1, 1, 1)
+        cube1 = Cube(0, 0, -2, 200, 1, 1, 1)
         cube1.draw_cube(cube1.set_vertices())
-        cube2 = Cube(0, 0, 4, 700, 1, 1, 1)
+        cube2 = Cube(0, 0, -4, 700, 1, 1, 1)
         cube2.draw_origin(cube2.set_vertices())
-        cube3 = Cube(0, 0, 6, 200, 1, 1, 1)
+        cube3 = Cube(0, 0, -6, 200, 1, 1, 1)
         cube3.draw_cube(cube3.set_vertices())
-        cube12 = Cube(0, 0, 8, 700, 1, 1, 1)
+        cube12 = Cube(0, 0, -8, 700, 1, 1, 1)
         cube12.draw_origin(cube12.set_vertices())
 
         # x axis:

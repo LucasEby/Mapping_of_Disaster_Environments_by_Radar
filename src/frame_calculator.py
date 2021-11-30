@@ -34,11 +34,18 @@ class FrameCalculator:
         # h_angle = h_angle - 115
         # v_angle = -(v_angle - 180)
 
-        rotated_x = x * math.cos(h_angle) + math.sin(h_angle) * math.cos(v_angle) * (self.__y_off - y) \
-            + math.sin(h_angle) * math.sin(v_angle) * z
-        rotated_y = (y - self.__y_off) * math.sin(v_angle) + z * math.cos(v_angle)
-        rotated_z = -x * math.sin(h_angle) + (self.__y_off - y) * math.cos(h_angle) * math.cos(v_angle) \
-            + z * math.cos(h_angle) * math.sin(v_angle)
+        # Previous
+        # rotated_x = x * math.cos(h_angle) + math.sin(h_angle) * math.cos(v_angle) * (self.__y_off - y) \
+        #     + math.sin(h_angle) * math.sin(v_angle) * z
+        # rotated_y = (y - self.__y_off) * math.sin(v_angle) + z * math.cos(v_angle)
+        # rotated_z = -x * math.sin(h_angle) + (self.__y_off - y) * math.cos(h_angle) * math.cos(v_angle) \
+        #     + z * math.cos(h_angle) * math.sin(v_angle)
+        # pos_array = [rotated_x, rotated_y, rotated_z]
+
+        #Testing:
+        rotated_x = x * math.cos(h_angle) -z * math.sin(h_angle)
+        rotated_y = x * math.cos(v_angle) * math.sin(h_angle) + y * math.sin(v_angle) + z * math.cos(h_angle) * math.cos(v_angle)
+        rotated_z = x * math.sin(h_angle) * math.sin(v_angle) - y * math.cos(v_angle) + z * math.cos(h_angle) * math.sin(v_angle)
         pos_array = [rotated_x, rotated_y, rotated_z]
         return pos_array
 

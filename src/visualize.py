@@ -97,6 +97,7 @@ class Plot3D(Plot):
         self.zs.append(object.z)
         self.cs.append(object.snr)
 
+
 class Plot2D(Plot):
 
     def __init__(self, resolution: float = None):
@@ -154,6 +155,7 @@ class Plot2D(Plot):
             except IndexError:
                 pass
 
+
 class PlotCubes(Plot):
     def __init__(self, resolution: float = None):
         """__init__ initialize the plot
@@ -171,7 +173,7 @@ class PlotCubes(Plot):
         pygame.init()
         display = (800, 600)
         pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-        gluPerspective(45, (display[0] / display[1]), 1, 1000.0)
+        gluPerspective(45, (display[0] / display[1]), 1, 10000.0)
 
     def draw(self, x_rotation, y_rotation, z_translation, y_translation) -> None:
         """draw draw/re-draw this plot
