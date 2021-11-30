@@ -1,6 +1,7 @@
 # Standard Library Imports
 from abc import ABC, abstractmethod
 from time import sleep
+from math import sqrt
 
 # Package Imports
 import numpy as np
@@ -165,7 +166,7 @@ class Plot2D(Plot):
         self.grid = np.zeros((max(self.xaxis.shape), max(self.zaxis.shape)))
         self.fig = plt.figure()
         self.fig_num = plt.gcf().number
-        plt.imshow(np.flipud(self.grid), extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
+        self.im = plt.imshow(np.flipud(self.grid), extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
         plt.xlabel("X Axis (m)")
         plt.ylabel("Z Axis (m)")
         plt.title("Range Map")
@@ -176,8 +177,11 @@ class Plot2D(Plot):
     def draw(self) -> None:
         """draw draw/re-draw this plot
         """
-        plt.figure(self.fig_num)
-        plt.imshow(np.flipud(self.grid),extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
+        #plt.figure(self.fig_num)
+        #plt.imshow(np.flipud(self.grid),extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
+        #self.im.set_data(np.flipud(self.grid))
+        self.im.set_data(self.grid)
+        self.im.autoscale()
         super().draw()
 
     def update(self, object: DetectedObject) -> None:
@@ -196,8 +200,9 @@ class Plot2D(Plot):
             xloc = xloc[0]
             zloc = zloc[0]
             try:
-                self.grid[xloc,zloc] = y
-                self.ys.append(y)
+                if y >= 0.0:
+                    self.grid[xloc,zloc] = y
+                    self.ys.append(y)
             except IndexError:
                 pass
 
