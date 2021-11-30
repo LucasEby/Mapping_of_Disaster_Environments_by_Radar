@@ -7,6 +7,7 @@ from cube_components import CubeComponents
 # Standard Library Imports
 None
 
+
 class Cube:
     """ [summary]
     """
@@ -92,7 +93,30 @@ class Cube:
         :return: nothing
         """
         glBegin(GL_QUADS)
-        glColor3fv(CubeComponents.colors[self.color])
+        try:
+            glColor3fv(CubeComponents.colors[self.color])
+        except IndexError:
+            glColor3fv(CubeComponents.colors[1529])
+        for surface in CubeComponents.surfaces:
+            for vertex in surface:
+                glVertex(new_vertices[vertex])
+        glEnd()
+
+        glBegin(GL_LINES)
+        glColor3fv((1, 1, 1))
+        for edge in CubeComponents.edges:
+            for vertex in edge:
+                glVertex3fv(new_vertices[vertex])
+        glEnd()
+
+    def draw_origin(self, new_vertices) -> None:
+        """
+        This class is used to plot the cube in its correct position and color.
+        :param new_vertices: the positions of the vertices that are being plotted.
+        :return: nothing
+        """
+        glBegin(GL_QUADS)
+        glColor3fv((1, 1, 1))
         for surface in CubeComponents.surfaces:
             for vertex in surface:
                 glVertex(new_vertices[vertex])

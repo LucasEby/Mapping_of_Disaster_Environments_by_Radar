@@ -260,21 +260,21 @@ class Manager:
     def handle_keyboard_inputs(self):
         if self.plot_mode == PlotMode.PLOT_CUBES:
             if keyboard.is_pressed("left"):
-                self.y_rotation = self.y_rotation - 10
+                self.y_rotation = self.y_rotation - 5
             elif keyboard.is_pressed("right"):
-                self.y_rotation = self.y_rotation + 10
+                self.y_rotation = self.y_rotation + 5
             elif keyboard.is_pressed("up"):
-                self.x_rotation = self.x_rotation - 10
+                self.x_rotation = self.x_rotation - 5
             elif keyboard.is_pressed("down"):
-                self.x_rotation = self.x_rotation + 10
+                self.x_rotation = self.x_rotation + 5
             elif keyboard.is_pressed("/"):
-                self.z_translation = self.z_translation + 10
+                self.z_translation = self.z_translation + 5
             elif keyboard.is_pressed("Shift"):
-                self.z_translation = self.z_translation - 10
+                self.z_translation = self.z_translation - 5
             elif keyboard.is_pressed(";"):
-                self.y_translation = self.y_translation - 10
+                self.y_translation = self.y_translation - 5
             elif keyboard.is_pressed("\'"):
-                self.y_translation = self.y_translation + 10
+                self.y_translation = self.y_translation + 5
             elif keyboard.is_pressed("."):
                 # resets all keys
                 self.x_rotation = 0
