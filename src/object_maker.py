@@ -1,7 +1,6 @@
 # Self Imports
 from cube import Cube
 from cube_list_creator import CubeListCreator
-
 # Standard Library Imports
 import math
 
@@ -152,7 +151,9 @@ class ObjectMaker:
         z_pos = self.__z_min + half_z_length
         # color_index = self.__calc_color(((self.__angle_max - self.__angle_min) / 2) + self.__angle_min)
         # color_index: int = math.floor((math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)) % 1530)
-        color_index = z_pos*715.0
+        # color_index = z_pos*715.0
+        # color_index = int(round(color_index))
+        color_index = math.sqrt(z_pos**2+x_pos**2+y_pos**2) * 715.0
         color_index = int(round(color_index))
         # if color_index > 1530:
         #    color_index = 715
