@@ -11,6 +11,7 @@ from pymeasure.instruments.validators import truncated_range, strict_discrete_se
 # Self Imports
 from timer import Timer, TimeOutException
 
+
 class Utils:
     """Utils are utilities for this file
     """

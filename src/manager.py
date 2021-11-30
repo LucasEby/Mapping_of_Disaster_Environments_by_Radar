@@ -61,6 +61,7 @@ class Manager:
             self.input_angles_queue = Queue(1)  # TODO: my edits
             self.angles_queue = Queue(1)
             self.arduino_process = None
+            # self.page_control: PageControlProcess = PageControlProcess(self.input_angles_queue)
             self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
         self.reset()
         self.x_rotation = 0
@@ -71,7 +72,6 @@ class Manager:
     def reset(self) -> None:
         """reset resets the manager, and restarts any processes, port finders, or controllers
         """
-        self.enable = False
         self.yeet(yeet_queue=False)
         self.ports = Ports(attach_time=self.port_attach_time, attach_to_ports=False, find_arduino=self.run_arduino_process)
         self.iwr6843_process = IWR6843ReadProcess(self.objects_queue, self.ports.data_port, 921600, 0.1)
@@ -203,27 +203,26 @@ class Manager:
         sort : bool
             specifies whether or not to sort the dictionary after adding detected objects, by default False
         """
-        if self.enable:
-            # Loop through each detected object
-            for object in detected_objects:
-                # Check that this object is not None (i.e. has members)
-                if object.x and object.y and object.z and object.snr:
-                    x = object.x
-                    y = object.y
-                    z = object.z
+        # Loop through each detected object
+        for object in detected_objects:
+            # Check that this object is not None (i.e. has members)
+            if object.x and object.y and object.z and object.snr:
+                x = object.x
+                y = object.y
+                z = object.z
 
-                    # Rotate the coordinates if needed
-                    x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
+                # Rotate the coordinates if needed
+                x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
 
-                    # Check if this detected object is in a new voxel or not
-                    temp = DetectedObjectVoxel(x,y,z,snr=object.snr)
-                    try:
-                        getting = self.voxels_dict[temp]
-                        del getting
-                    # Detected object is a new object
-                    except KeyError:
-                        self.voxels_dict[temp] = temp
-                        self.plot.update(temp)
+                # Check if this detected object is in a new voxel or not
+                temp = DetectedObjectVoxel(x,y,z,snr=object.snr)
+                try:
+                    getting = self.voxels_dict[temp]
+                    del getting
+                # Detected object is a new object
+                except KeyError:
+                    self.voxels_dict[temp] = temp
+                    self.plot.update(temp)
         if sort:
             self.voxels_dict = {k: v for k, v in sorted(self.voxels_dict.items(), key=cmp_to_key(compare_detected_object_voxels))}
 
@@ -235,8 +234,6 @@ class Manager:
         if self.run_arduino_process:
             temp = self.get_servo_angle()
             if temp and (temp != self.rotation):
-                if not(self.enable):
-                    self.enable = True
                 self.rotation = temp
 
         # Get detected objects
@@ -298,6 +295,9 @@ class Manager:
         run runs the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and
         keeps itself alive
         """
+        # self.page_control.start_page()   # TODO:
+        # self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
+        # self.input_page.start()
         while True:
             # Handle pygame events
             self.handle_pygame_events()

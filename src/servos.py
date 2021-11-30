@@ -1,5 +1,8 @@
-from serial import Serial
+from termios import error
+
+from serial import Serial, SerialException
 import time
+
 
 class Servos:
     """Servos provides the data transfer between external computer and Arduino board

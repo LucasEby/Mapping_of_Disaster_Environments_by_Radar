@@ -42,7 +42,7 @@ class FrameCalculator:
         #     + z * math.cos(h_angle) * math.sin(v_angle)
         # pos_array = [rotated_x, rotated_y, rotated_z]
 
-        #Testing:
+        # Flipped rotation order:
         rotated_x = x * math.cos(h_angle) -z * math.sin(h_angle)
         rotated_y = x * math.cos(v_angle) * math.sin(h_angle) + y * math.sin(v_angle) + z * math.cos(h_angle) * math.cos(v_angle)
         rotated_z = x * math.sin(h_angle) * math.sin(v_angle) - y * math.cos(v_angle) + z * math.cos(h_angle) * math.sin(v_angle)

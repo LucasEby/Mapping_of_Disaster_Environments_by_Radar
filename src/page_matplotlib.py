@@ -16,29 +16,25 @@ class PageMatplotlib(Process):
         self.target = self.show_page
         super(PageMatplotlib, self).__init__(target=self.show_page)
 
-    def show_page(self):
+    def  show_page(self):
         self.fig = plt.figure()
 
         self.ax_box_horizontal = plt.axes([0.4, 0.66, 0.1, 0.075])
         self.text_box_horizontal = TextBox( self.ax_box_horizontal, 'Horizontal: ', initial="100")
         self.text_box_horizontal.on_submit(self.get_horizontal)
-
+    
         self.ax_box_vertical = plt.axes([0.4, 0.55, 0.1, 0.075])
         self.text_box_vertical = TextBox(self.ax_box_vertical, 'Vertical: ', initial="180")
         self.text_box_vertical.on_submit(self.get_vertical)
-
+        
         self.ax_b_move = plt.axes([0.4, 0.44, 0.1, 0.075])
         self.b_move = Button(self.ax_b_move, 'Move')
         self.b_move.on_clicked(self.move)
-
+        
         self.ax_b_reset = plt.axes([0.4, 0.33, 0.1, 0.075])
         self.b_reset = Button(self.ax_b_reset, 'Reset')
         self.b_reset.on_clicked(self.reset)
-
-        self.ax_b_complete_rotate = plt.axes([0.4, 0.22, 0.2, 0.075])
-        self.b_complete_rotate = Button(self.ax_b_complete_rotate, 'Complete Scan')
-        self.b_complete_rotate.on_clicked(self.complete_rotate)
-
+        
         plt.show()
         plt.pause(0.01)
 
@@ -54,24 +50,8 @@ class PageMatplotlib(Process):
             print("cmd in page_matplotlib: " + cmd)
             self.queue.put(cmd)
 
-    """
     def reset(self, event):
         self.h_angle = 100
         self.v_angle = 180
         self.text_box_horizontal.set_val("100")
         self.text_box_vertical.set_val("180")
-            # print("cmd in page_matplotlib: " + cmd)
-            self.queue.put(cmd)
-    """
-
-    def reset(self, event):
-        self.text_box_horizontal.set_val("100")
-        self.text_box_vertical.set_val("180")
-        cmd = "r r"
-        if self.queue.empty():
-            self.queue.put(cmd)
-
-    def complete_rotate(self, event):
-        cmd = "w r"
-        if self.queue.empty():
-            self.queue.put(cmd)

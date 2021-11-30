@@ -7,6 +7,7 @@ from cube_components import CubeComponents
 # Standard Library Imports
 None
 
+
 class Cube:
     """ [summary]
     """
