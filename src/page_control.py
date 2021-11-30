@@ -33,7 +33,6 @@
 #         self.__page.draw_frame_mapping()
 #         print("here in gui")
 #         self.__page.mainloop()
-        
 
 #     def get_entry_inputs(self, entries: Dict[str, tk.StringVar]) -> None:
 #         """get the inputs from the entry boxes which is typed in by the user and pass them to Servos

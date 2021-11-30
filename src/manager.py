@@ -61,7 +61,6 @@ class Manager:
             self.input_angles_queue = Queue(1)  # TODO: my edits
             self.angles_queue = Queue(1)
             self.arduino_process = None
-            # self.page_control: PageControlProcess = PageControlProcess(self.input_angles_queue)
             self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
         self.reset()
         self.x_rotation = 0
@@ -295,9 +294,6 @@ class Manager:
         run runs the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and
         keeps itself alive
         """
-        # self.page_control.start_page()   # TODO:
-        # self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
-        # self.input_page.start()
         while True:
             # Handle pygame events
             self.handle_pygame_events()

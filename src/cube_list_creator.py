@@ -3,8 +3,7 @@ import json
 
 # Package Imports
 import pygame
-from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, glRotatef, glPushMatrix, glPopMatrix, \
-    glTranslatef, glWindowPos2d, glDrawPixels, GL_RGBA, GL_UNSIGNED_BYTE
+from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, glRotatef, glPushMatrix, glPopMatrix, glTranslatef
 
 # Self Imports
 from cube import Cube
@@ -123,7 +122,7 @@ class CubeListCreator:
         pygame.display.flip()  # .update() doesn't work here for some reason
         glPopMatrix()
 
-    #def drawText(self, x, y, text):
+    # def drawText(self, x, y, text):
     #    font = pygame.font.SysFont('arial', 64)
     #    textSurface = font.render(text, True, (255, 0, 0, 255), (0, 66, 0, 255)).convert_alpha()
     #    textSurface.set_alpha(127)

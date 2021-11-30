@@ -11,7 +11,6 @@
 #         """
 #         # __init__ function for class Tk
 #         tk.Tk.__init__(self, *args, **kwargs)
-        
 #         # self._root: tk.Tk = tk.Tk(className=' Mapping of Disaster Environment')
 #         # self._root.minsize(700, 500)    # set the minimal size to "700x500"
 #         # self._root.geometry("700x500")  # set the starting window size to "700x500"

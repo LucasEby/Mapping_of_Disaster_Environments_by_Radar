@@ -1,7 +1,5 @@
 # Standard Library Imports
 from abc import ABC, abstractmethod
-from time import sleep
-from math import sqrt
 
 # Package Imports
 import numpy as np
@@ -9,7 +7,6 @@ import matplotlib.pyplot as plt
 import pygame
 from pygame.locals import DOUBLEBUF, OPENGL
 from OpenGL.GLU import gluPerspective
-#import open3d as o3d
 
 # Self Imports
 from data import DetectedObject, DetectedObjectVoxel, MathUtils
@@ -45,7 +42,6 @@ class Plot(ABC):
             the object used to update the values
         """
         pass
-
 
 class Plot3D(Plot):
     """Plot3D is a helper class to plot detected objects
@@ -130,9 +126,9 @@ class Plot2D(Plot):
     def draw(self) -> None:
         """draw draw/re-draw this plot
         """
-        #plt.figure(self.fig_num)
-        #plt.imshow(np.flipud(self.grid),extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
-        #self.im.set_data(np.flipud(self.grid))
+        # plt.figure(self.fig_num)
+        # plt.imshow(np.flipud(self.grid),extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
+        # self.im.set_data(np.flipud(self.grid))
         self.im.set_data(self.grid)
         self.im.autoscale()
         super().draw()
