@@ -203,28 +203,32 @@ class Manager:
         sort : bool
             specifies whether or not to sort the dictionary after adding detected objects, by default False
         """
-        # Loop through each detected object
-        for object in detected_objects:
-            # Check that this object is not None (i.e. has members)
-            if object.x and object.y and object.z and object.snr:
-                x = object.x
-                y = object.y
-                z = object.z
+        if not(self.arduino_process.wait_flag):
+            # Loop through each detected object
+            for object in detected_objects:
+                # Check that this object is not None (i.e. has members)
+                if object.x and object.y and object.z and object.snr:
+                    x = object.x
+                    y = object.y
+                    z = object.z
 
-                # Rotate the coordinates if needed
-                x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
+                    # Rotate the coordinates if needed
+                    #x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
 
-                # Check if this detected object is in a new voxel or not
-                temp = DetectedObjectVoxel(x,y,z,snr=object.snr)
-                try:
-                    getting = self.voxels_dict[temp]
-                    del getting
-                # Detected object is a new object
-                except KeyError:
-                    self.voxels_dict[temp] = temp
-                    self.plot.update(temp)
-        if sort:
-            self.voxels_dict = {k: v for k, v in sorted(self.voxels_dict.items(), key=cmp_to_key(compare_detected_object_voxels))}
+                    # Check if this detected object is in a new voxel or not
+                    temp = DetectedObjectVoxel(x,y,z,snr=object.snr,noise=object.noise)
+                    if temp.snr > 0.5*temp.noise:
+                        self.voxels_dict[temp] = temp
+                        self.plot.update(temp)
+                    #try:
+                    #    getting = self.voxels_dict[temp]
+                    #    del getting
+                    # Detected object is a new object
+                    #except KeyError:
+                    #    self.voxels_dict[temp] = temp
+                    #    self.plot.update(temp)
+            if sort:
+                self.voxels_dict = {k: v for k, v in sorted(self.voxels_dict.items(), key=cmp_to_key(compare_detected_object_voxels))}
 
     def routine(self):
         """routine a single routine of the manager where it retrieves and handles data and re-draws the plot based on data

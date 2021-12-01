@@ -119,7 +119,7 @@ class Plot2D(Plot):
         self.grid = np.zeros((max(self.xaxis.shape), max(self.zaxis.shape)))
         self.fig = plt.figure()
         self.fig_num = plt.gcf().number
-        plt.imshow(np.flipud(self.grid), extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
+        self.im = plt.imshow(np.flipud(self.grid), extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
         plt.xlabel("X Axis (m)")
         plt.ylabel("Z Axis (m)")
         plt.title("Range Map")
@@ -130,8 +130,8 @@ class Plot2D(Plot):
     def draw(self) -> None:
         """draw draw/re-draw this plot
         """
-        plt.figure(self.fig_num)
-        plt.imshow(np.flipud(self.grid),extent=[self.xaxis[0], self.xaxis[-1], self.zaxis[0], self.zaxis[-1]])
+        self.im.set_data(self.grid)
+        self.im.autoscale()
         super().draw()
 
     def update(self, object: DetectedObject) -> None:
@@ -189,5 +189,5 @@ class PlotCubes(Plot):
             the object used to update the values
         """
         azimuth = 90.0 + MathUtils.get_azimuth(object.x, object.z)
-        if object.z >= 0.0:
-            self.maker.add_new_point(object.x, object.y, object.z, azimuth, True)
+        #if object.z >= 0.0:
+        self.maker.add_new_point(object.x, object.z, -object.y, azimuth, True)

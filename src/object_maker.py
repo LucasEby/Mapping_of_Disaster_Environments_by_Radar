@@ -21,7 +21,7 @@ class ObjectMaker:
         :param resolution: the resolution of the data recieved.
         """
         # Units are in meters:
-        self.__round_amount = 0.04
+        self.__round_amount = 0.5
         # Angle amount per color:
         self.__angle_per_color = 360.0/1531.0
         # Units are in meters:
@@ -170,7 +170,7 @@ class ObjectMaker:
         # correct:
         # self.__list_creator.add_new_cube(Cube(x_pos, y_pos, z_pos, color_index, half_x_length, half_y_length, half_z_length))
         self.__list_creator.add_new_cube(
-            Cube(50.0 * x_pos, 50.0 * y_pos, -50.0 * z_pos, color_index, half_x_length, half_y_length, half_z_length))
+            Cube(50.0 * x_pos, 50.0 * y_pos, 50.0 * z_pos, color_index, half_x_length, half_y_length, half_z_length))
         # set x, y, and z parameters to be the new object in consideration:
         self.__x_min = self.__x_max = x
         self.__y_min = self.__y_max = y

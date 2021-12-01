@@ -10,6 +10,7 @@ from typing import List, Union, Tuple, Any, Dict
 from serial import Serial
 import json
 import csv
+import math
 
 # Self Imports
 from control import Ports
@@ -91,7 +92,7 @@ class MathUtils:
     ONEHUNDRENDEIGHTYOVERPI = 57.2957795131
 
     # Offest for Y-axis rotation
-    Y_OFF = 2
+    Y_OFF = 0
 
     @classmethod
     def radians_to_degrees(cls, angle: float) -> float:
@@ -201,17 +202,24 @@ class MathUtils:
         Tuple[float, float, float]
             the rotated x, y, and z coordinates
         """
+        rotated_x = x * math.cos(h) - (z * math.sin(h))
+        rotated_y = x * math.cos(v) * math.sin(h) + y * math.sin(v) + z * math.cos(h) * math.cos(v)
+        rotated_z = x * math.sin(h) * math.sin(v) - y * math.cos(v) + z * math.cos(h) * math.sin(v)
+        #pos_array = [rotated_x, rotated_y, rotated_z]
+
+        """
         rotated_x = \
             (x * cos(h)) + \
             (sin(h) * cos(v) * (cls.Y_OFF - y)) + \
             (sin(h) * sin(v) * z)
         rotated_y = \
-            ((y - cls.Y_OFF) * sin(v)) +\
+            ((y - cls.Y_OFF) * sin(v)) + \
             (z * cos(v))
         rotated_z = \
             (-x * sin(h)) + \
             ((cls.Y_OFF - y) * cos(h) * cos(v)) + \
             (z * cos(h) * sin(v))
+        """
         return rotated_x, rotated_y, rotated_z
 
 class Utils:

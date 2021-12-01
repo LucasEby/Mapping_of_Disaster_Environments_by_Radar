@@ -30,6 +30,8 @@ class IWR6843ReadProcess(Process):
         self.serial = None
         self.parser = PacketHandler()
         self.target = self.read_serial
+        # Temp
+        self.counter = 0
 
     def read_serial(self, serial_port: str, baudrate: int, timeout: float):
         """read_serial is the target of this process which starts the serial port and reads from the serial port
@@ -52,6 +54,8 @@ class IWR6843ReadProcess(Process):
             if len(read_buffer) > 0:
                 parsed = self.parser.parser(read_buffer)
                 if parsed:
+                    #self.counter = self.counter + 1
+                    #print(self.counter)
                     self.queue.put(parsed)
             sleep(0.01)
 
@@ -86,6 +90,7 @@ class ArduinoReadProcess(Process):
         self.queue = queue
         self.serial = None
         self.target = self.read_serial
+        self.wait_flag = False
 
     def read_serial(self, serial_port: str, baudrate: int, timeout: float):
         """read_serial is the target of this process which starts the serial port and reads from the serial port
@@ -105,7 +110,7 @@ class ArduinoReadProcess(Process):
                 self.serial.write(bytes(input_angles[0], 'utf-8'))
                 sleep(0.5)
                 self.serial.write(bytes(input_angles[1], 'utf-8'))
-                sleep(0.1)
+                sleep(0.5)
             read_buffer = []
             try:
                 read_buffer = self.serial.readline()
@@ -114,13 +119,24 @@ class ArduinoReadProcess(Process):
             if len(read_buffer) > 0:
                 try:
                     read_buffer = read_buffer.decode('utf-8')
+                except UnicodeDecodeError:
+                    pass
+                try:
+                    if read_buffer == "start":
+                        self.wait_flag = True
+                    elif read_buffer == "stop":
+                        self.wait_flag = False
+                except:
+                    pass
+                try:
                     read_buffer = read_buffer.split(",")
                     try:
                         hv_values = (float(read_buffer[0]),float(read_buffer[1]))
                         self.queue.put(hv_values)
+                        self.wait_flag = False
                     except IndexError:
                         break
-                except UnicodeDecodeError:
+                except:
                     pass
             sleep(0.01)
 
