@@ -115,7 +115,7 @@ class Manager:
             if not(self.angles_queue.empty()):
                 hv = self.angles_queue.get()
                 #print("recieved angles ", hv)
-                return  ((math.pi/180.0)*hv[0], (math.pi/180.0)*hv[1])
+                return  ((-math.pi/180.0)*hv[0], (-math.pi/180.0)*hv[1])
         return None
 
     def detected_objects_are_present(self) -> bool:
@@ -239,11 +239,12 @@ class Manager:
 
                         # Rotate the coordinates if needed
                         x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
+                        if object.snr > 0.0*object.noise and object.y>=0.0:
+                            # Check if this detected object is in a new voxel or not
 
-                        # Check if this detected object is in a new voxel or not
-                        temp = DetectedObjectVoxel(x,y,z,snr=object.snr,noise=object.noise)
-                        self.voxels_dict[temp] = temp
-                        self.plot.update(temp)
+                            temp = DetectedObjectVoxel(x,y,z,snr=object.snr,noise=object.noise)
+                            self.voxels_dict[temp] = temp
+                            self.plot.update(temp)
                 if sort:
                     self.voxels_dict = {k: v for k, v in sorted(self.voxels_dict.items(), key=cmp_to_key(compare_detected_object_voxels))}
         else:

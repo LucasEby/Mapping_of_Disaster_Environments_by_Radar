@@ -207,10 +207,13 @@ class MathUtils:
         #rotated_z = x * math.sin(h) * math.sin(v) - y * math.cos(v) + z * math.cos(h) * math.sin(v)
         #pos_array = [rotated_x, rotated_y, rotated_z]
 
-        rotated_x = x*(math.cos(h)) + y*(-math.cos(v)*math.sin(h)) + z*(math.sin(h)*math.sin(v))
-        rotated_y = x*(0) + y*(math.sin(v)) + z*(math.cos(v))
-        rotated_z = x*(-math.sin(h)) + y*(-math.cos(h)*math.cos(v)) + z*(math.cos(h)*math.sin(v))
+        # rotated_x = x*(math.cos(h)) + y*(-math.cos(v)*math.sin(h)) + z*(math.sin(h)*math.sin(v))
+        # rotated_y = x*(0) + y*(math.sin(v)) + z*(math.cos(v))
+        # rotated_z = x*(-math.sin(h)) + y*(-math.cos(h)*math.cos(v)) + z*(math.cos(h)*math.sin(v))
 
+        rotated_x = x*(math.cos(h)) + y*(-math.cos(v)*math.sin(h)) + z*(math.sin(h)*math.sin(v))
+        rotated_y = x*(math.sin(h)) + y*(math.cos(v)*math.cos(h)) + z*(-math.cos(h)*math.sin(v))
+        rotated_z = x*(0) + y*(math.sin(v)) + z*(math.cos(v))
         """
         rotated_x = \
             (x * cos(h)) + \
