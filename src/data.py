@@ -5,12 +5,12 @@ from binascii import hexlify
 from codecs import decode
 from enum import Enum
 from typing import List, Union, Tuple, Any, Dict
-
-# Package Imports
-from serial import Serial
 import json
 import csv
 import math
+
+# Package Imports
+from serial import Serial
 
 # Self Imports
 from control import Ports
@@ -92,7 +92,7 @@ class MathUtils:
     ONEHUNDRENDEIGHTYOVERPI = 57.2957795131
 
     # Offest for Y-axis rotation
-    Y_OFF = 0
+    Y_OFF = 31.21 / 1000.0
 
     @classmethod
     def radians_to_degrees(cls, angle: float) -> float:
@@ -202,10 +202,14 @@ class MathUtils:
         Tuple[float, float, float]
             the rotated x, y, and z coordinates
         """
-        rotated_x = x * math.cos(h) - (z * math.sin(h))
-        rotated_y = x * math.cos(v) * math.sin(h) + y * math.sin(v) + z * math.cos(h) * math.cos(v)
-        rotated_z = x * math.sin(h) * math.sin(v) - y * math.cos(v) + z * math.cos(h) * math.sin(v)
+        #rotated_x = x * math.cos(h) - (z * math.sin(h))
+        #rotated_y = x * math.cos(v) * math.sin(h) + y * math.sin(v) + z * math.cos(h) * math.cos(v)
+        #rotated_z = x * math.sin(h) * math.sin(v) - y * math.cos(v) + z * math.cos(h) * math.sin(v)
         #pos_array = [rotated_x, rotated_y, rotated_z]
+
+        rotated_x = x*(math.cos(h)) + y*(-math.cos(v)*math.sin(h)) + z*(math.sin(h)*math.sin(v))
+        rotated_y = x*(0) + y*(math.sin(v)) + z*(math.cos(v))
+        rotated_z = x*(-math.sin(h)) + y*(-math.cos(h)*math.cos(v)) + z*(math.cos(h)*math.sin(v))
 
         """
         rotated_x = \
@@ -456,6 +460,9 @@ class DetectedObject:
         self.snr = snr
         self.noise = noise
         return
+    
+    def __repr__(self) -> str:
+        return f"{self.x}, {self.y}, {self.z}"
 
 class DetectedObjectVoxel(DetectedObject):
     """DetectedObjectVoxel DetectedObjectVoxel stores info on a detected object parsed from a packet from the IWR6843 as well as functioning as a voxel

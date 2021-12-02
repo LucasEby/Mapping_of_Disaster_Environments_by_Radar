@@ -1,6 +1,7 @@
 # Self Imports
 from cube import Cube
 from cube_list_creator import CubeListCreator
+
 # Standard Library Imports
 import math
 
@@ -21,7 +22,7 @@ class ObjectMaker:
         :param resolution: the resolution of the data recieved.
         """
         # Units are in meters:
-        self.__round_amount = 0.5
+        self.__round_amount = 0.1
         # Angle amount per color:
         self.__angle_per_color = 360.0/1531.0
         # Units are in meters:

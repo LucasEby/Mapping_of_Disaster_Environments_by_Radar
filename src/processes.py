@@ -30,8 +30,6 @@ class IWR6843ReadProcess(Process):
         self.serial = None
         self.parser = PacketHandler()
         self.target = self.read_serial
-        # Temp
-        self.counter = 0
 
     def read_serial(self, serial_port: str, baudrate: int, timeout: float):
         """read_serial is the target of this process which starts the serial port and reads from the serial port
@@ -54,8 +52,6 @@ class IWR6843ReadProcess(Process):
             if len(read_buffer) > 0:
                 parsed = self.parser.parser(read_buffer)
                 if parsed:
-                    #self.counter = self.counter + 1
-                    #print(self.counter)
                     self.queue.put(parsed)
             sleep(0.01)
 
@@ -66,7 +62,7 @@ class IWR6843ReadProcess(Process):
         except AttributeError:
             pass
         try:
-            del self.parser
+            del self.parserrint
         except AttributeError:
             pass
         super().kill()
@@ -74,7 +70,7 @@ class IWR6843ReadProcess(Process):
 class ArduinoReadProcess(Process):
     """ArduinoReadProcess represents a process to handle reading from the arduino serial port in another process
     """
-    def __init__(self, input_queue: Queue, queue: Queue, serial_port: str, baudrate: int, timeout: float):
+    def __init__(self, input_queue: Queue, queue: Queue, serial_port: str, baudrate: int, timeout: float, shared_obj):
         """__init__ sets up the data for the serial process
         Parameters
         ----------
@@ -85,14 +81,13 @@ class ArduinoReadProcess(Process):
         timeout : float
             the timeout to add to the serial port
         """
-        super(ArduinoReadProcess, self).__init__(target=self.read_serial, args=(serial_port, baudrate, timeout))
+        super(ArduinoReadProcess, self).__init__(target=self.read_serial, args=(serial_port, baudrate, timeout, shared_obj))
         self.input_queue = input_queue
         self.queue = queue
         self.serial = None
         self.target = self.read_serial
-        self.wait_flag = False
 
-    def read_serial(self, serial_port: str, baudrate: int, timeout: float):
+    def read_serial(self, serial_port: str, baudrate: int, timeout: float, shared_obj):
         """read_serial is the target of this process which starts the serial port and reads from the serial port
         Parameters
         ----------
@@ -122,10 +117,11 @@ class ArduinoReadProcess(Process):
                 except UnicodeDecodeError:
                     pass
                 try:
+                    read_buffer = read_buffer.rstrip("\r\n")
                     if read_buffer == "start":
-                        self.wait_flag = True
+                        shared_obj.set(True)
                     elif read_buffer == "stop":
-                        self.wait_flag = False
+                        shared_obj.set(False)
                 except:
                     pass
                 try:

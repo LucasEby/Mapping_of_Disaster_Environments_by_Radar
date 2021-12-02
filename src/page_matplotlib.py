@@ -51,7 +51,7 @@ class PageMatplotlib(Process):
     def move(self, event):
         cmd = "h" + str(self.h_angle) + " v" + str(self.v_angle)
         if self.queue.empty():
-            # print("cmd in page_matplotlib: " + cmd)
+            print("cmd in page_matplotlib: " + cmd)
             self.queue.put(cmd)
 
     def reset(self, event):

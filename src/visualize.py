@@ -1,6 +1,7 @@
 # Standard Library Imports
 from abc import ABC, abstractmethod
 from time import sleep
+import math
 
 # Package Imports
 import numpy as np
@@ -150,7 +151,8 @@ class Plot2D(Plot):
             xloc = xloc[0]
             zloc = zloc[0]
             try:
-                self.grid[xloc,zloc] = y
+                self.grid[xloc,zloc] = y# math.sqrt(x*x + y*y + z*z)
+                #print(math.sqrt(x*x + y*y + z*z))
                 self.ys.append(y)
             except IndexError:
                 pass
@@ -189,5 +191,4 @@ class PlotCubes(Plot):
             the object used to update the values
         """
         azimuth = 90.0 + MathUtils.get_azimuth(object.x, object.z)
-        #if object.z >= 0.0:
-        self.maker.add_new_point(object.x, object.z, -object.y, azimuth, True)
+        self.maker.add_new_point(object.x, object.y, object.z, azimuth, True)

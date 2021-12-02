@@ -1,29 +1,42 @@
-# Self Imports
-from control import Ports, Control
-from data import DetectedObject, DetectedObjectVoxel, MathUtils, Utils, compare_detected_object_voxels
-from processes import IWR6843ReadProcess, ArduinoReadProcess
-from visualize import Plot
-# from page_control import PageControlProcess
-from page_matplotlib import PageMatplotlib
-
 # Standard Library Imports
-from multiprocessing import Queue
-from time import sleep
-from typing import Tuple, List, Dict
-from functools import cmp_to_key
 from enum import Enum
-import keyboard
+from functools import cmp_to_key
+from multiprocessing import Queue, Manager
+from multiprocessing.managers import BaseManager
 from sys import exit
+from time import sleep
+from typing import Dict, List, Tuple
+import math
 
 # Package Imports
 import matplotlib.pyplot as plt
 import pygame
+import keyboard
+
+# Self Imports
+from control import Control, Ports
+from data import (DetectedObject, DetectedObjectVoxel, MathUtils, Utils,
+                  compare_detected_object_voxels)
+from page_matplotlib import PageMatplotlib
+from processes import ArduinoReadProcess, IWR6843ReadProcess
+from visualize import Plot
+
 
 class PlotMode(Enum):
     NONE = 0
     PLOT_2D = 1
     PLOT_3D = 2
     PLOT_CUBES = 3
+
+class Flag(object):
+    def __init__(self):
+        self.value = True
+    
+    def set(self, value):
+        self.value = value
+    
+    def get(self):
+        return self.value
 
 class Manager:
     """Manager starts and initializes any processes and objects for controlling and communicating with the IWR6843
@@ -45,8 +58,9 @@ class Manager:
         queue_size : int, optional
             the size of the queue from reading from the serial port, by default 100
         """
+        BaseManager.register('Flag', Flag)
+        self.manager = BaseManager()
         self.config_file_name = config_file_name
-        self.rotation = (0.0,0.0)
         self.port_attach_time = port_attach_time
         self.run_arduino_process = run_arduino_process
         self.output_file_name = output_file_name
@@ -58,11 +72,10 @@ class Manager:
         self.objects_queue = Queue(queue_size)
         self.iwr6843_process = None
         if self.run_arduino_process:
-            self.input_angles_queue = Queue(1)  # TODO: my edits
+            self.input_angles_queue = Queue(1)
             self.angles_queue = Queue(1)
             self.arduino_process = None
-            # self.page_control: PageControlProcess = PageControlProcess(self.input_angles_queue)
-            self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
+            self.input_page: PageMatplotlib = None
         self.reset()
         self.x_rotation = 0
         self.y_rotation = 0
@@ -76,10 +89,15 @@ class Manager:
         self.ports = Ports(attach_time=self.port_attach_time, attach_to_ports=False, find_arduino=self.run_arduino_process)
         self.iwr6843_process = IWR6843ReadProcess(self.objects_queue, self.ports.data_port, 921600, 0.1)
         if self.run_arduino_process:
-            self.arduino_process = ArduinoReadProcess(self.input_angles_queue, self.angles_queue, self.ports.arduino_port, 9600, 1)
+            self.manager.start()
+            self.inst = self.manager.Flag()
+            self.arduino_process = ArduinoReadProcess(self.input_angles_queue, self.angles_queue, self.ports.arduino_port, 9600, 1, self.inst)
+            self.input_page = PageMatplotlib(self.input_angles_queue)
         self.control = Control(self.config_file_name, self.ports)
         sleep(0.1)
         self.iwr6843_process.start()
+        self.origin = None
+        self.rotation = None
         if self.run_arduino_process:
             self.arduino_process.start()
             # self.page_control.run()
@@ -96,8 +114,8 @@ class Manager:
         if self.run_arduino_process:
             if not(self.angles_queue.empty()):
                 hv = self.angles_queue.get()
-                hv_new = (MathUtils.radians_to_degrees(hv[0]), MathUtils.radians_to_degrees(hv[1]))
-                return hv_new
+                #print("recieved angles ", hv)
+                return  ((math.pi/180.0)*hv[0], (math.pi/180.0)*hv[1])
         return None
 
     def detected_objects_are_present(self) -> bool:
@@ -154,6 +172,10 @@ class Manager:
         from_siqquit : bool, optional
             if True then the manager knows that the program wants to quit so will perform actions based off the sigquit signal, by default False
         """
+        #try:
+        #    self.manager.shutdown()
+        #except:
+        #    pass
         try:
             if self.iwr6843_process:
                 self.iwr6843_process.terminate()
@@ -164,7 +186,9 @@ class Manager:
             if self.run_arduino_process:
                 if self.arduino_process:
                     self.arduino_process.terminate()
+                    self.input_page.terminate()
                     del self.arduino_process
+                    del self.input_page
         except AttributeError:
             pass
         try:
@@ -203,7 +227,26 @@ class Manager:
         sort : bool
             specifies whether or not to sort the dictionary after adding detected objects, by default False
         """
-        if not(self.arduino_process.wait_flag):
+        if self.run_arduino_process:
+            if not(self.inst.get()) and self.rotation:
+                # Loop through each detected object
+                for object in detected_objects:
+                    # Check that this object is not None (i.e. has members)
+                    if object.x and object.y and object.z and object.snr:
+                        x = object.x
+                        y = object.y
+                        z = object.z
+
+                        # Rotate the coordinates if needed
+                        x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
+
+                        # Check if this detected object is in a new voxel or not
+                        temp = DetectedObjectVoxel(x,y,z,snr=object.snr,noise=object.noise)
+                        self.voxels_dict[temp] = temp
+                        self.plot.update(temp)
+                if sort:
+                    self.voxels_dict = {k: v for k, v in sorted(self.voxels_dict.items(), key=cmp_to_key(compare_detected_object_voxels))}
+        else:
             # Loop through each detected object
             for object in detected_objects:
                 # Check that this object is not None (i.e. has members)
@@ -212,21 +255,11 @@ class Manager:
                     y = object.y
                     z = object.z
 
-                    # Rotate the coordinates if needed
-                    #x,y,z = MathUtils.b_to_d_rotation(x,y,z,self.rotation[0],self.rotation[1])
-
                     # Check if this detected object is in a new voxel or not
                     temp = DetectedObjectVoxel(x,y,z,snr=object.snr,noise=object.noise)
-                    if temp.snr > 0.5*temp.noise:
-                        self.voxels_dict[temp] = temp
-                        self.plot.update(temp)
-                    #try:
-                    #    getting = self.voxels_dict[temp]
-                    #    del getting
-                    # Detected object is a new object
-                    #except KeyError:
-                    #    self.voxels_dict[temp] = temp
-                    #    self.plot.update(temp)
+                    
+                    self.voxels_dict[temp] = temp
+                    self.plot.update(temp)
             if sort:
                 self.voxels_dict = {k: v for k, v in sorted(self.voxels_dict.items(), key=cmp_to_key(compare_detected_object_voxels))}
 
@@ -237,8 +270,13 @@ class Manager:
         # Get the rotation angles if present or using arduino process to get the servo angle
         if self.run_arduino_process:
             temp = self.get_servo_angle()
-            if temp and (temp != self.rotation):
-                self.rotation = temp
+            if temp:
+                if (self.rotation is None) and (self.origin is None):
+                    self.origin = temp
+                    self.rotation = (0.0,0.0)
+                if not(self.rotation is None) and not(self.origin is None):
+                    if (temp != self.rotation):
+                        self.rotation = ((temp[0]-self.origin[0]),temp[1]-self.origin[1])
 
         # Get detected objects
         detected_objects = self.get_detected_objects()
@@ -299,9 +337,6 @@ class Manager:
         run runs the main routine of the manager where it grabs detected objects, handles data, re-draws the plot, and
         keeps itself alive
         """
-        # self.page_control.start_page()   # TODO:
-        # self.input_page: PageMatplotlib = PageMatplotlib(self.input_angles_queue)
-        # self.input_page.start()
         while True:
             # Handle pygame events
             self.handle_pygame_events()
