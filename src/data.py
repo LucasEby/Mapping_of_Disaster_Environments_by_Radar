@@ -1,10 +1,13 @@
 # Standard Library Imports
 from struct import unpack
-from math import sqrt, atan
+from math import sqrt, atan, cos, sin
 from binascii import hexlify
 from codecs import decode
 from enum import Enum
-from typing import List, Union
+from typing import List, Union, Tuple, Any, Dict
+import json
+import csv
+import math
 
 # Package Imports
 from serial import Serial
@@ -36,7 +39,10 @@ class BytesUtils:
         int
             the parsed integer
         """
-        return (data[0] + data[1]*256 + data[2]*65536 + data[3]*16777216)
+        try:
+            return (data[0] + data[1]*256 + data[2]*65536 + data[3]*16777216)
+        except IndexError:
+            return None
 
     @classmethod
     def get_uint16(cls, data: bytes) -> int:
@@ -52,7 +58,10 @@ class BytesUtils:
         int
             the parsed integer
         """
-        return (data[0] + data[1]*256)
+        try:
+            return (data[0] + data[1]*256)
+        except IndexError:
+            return None
 
     @classmethod
     def check_magic_pattern(cls, data: bytes) -> int:
@@ -69,14 +78,21 @@ class BytesUtils:
             the 0 or 1 value representing if a magic pattern was found in the IWR6843
         """
         found = 0
-        if (data[0] == 2 and data[1] == 1 and data[2] == 4 and data[3] == 3 and data[4] == 6 and data[5] == 5 and data[6] == 8 and data[7] == 7):
-            found = 1
-        return (found)
+        try:
+            if (data[0] == 2 and data[1] == 1 and data[2] == 4 and data[3] == 3 and data[4] == 6 and data[5] == 5 and data[6] == 8 and data[7] == 7):
+                found = 1
+        except IndexError:
+            pass
+        return found
 
 class MathUtils:
     """MathUtils are utiliites for performing calculations on recieved data
     """
+    # One hundred eighty over pi for radian to degrese conversion
     ONEHUNDRENDEIGHTYOVERPI = 57.2957795131
+
+    # Offest for Y-axis rotation
+    Y_OFF = 31.21 / 1000.0
 
     @classmethod
     def radians_to_degrees(cls, angle: float) -> float:
@@ -164,6 +180,142 @@ class MathUtils:
         else:
             return cls.radians_to_degrees(atan(z/sqrt((x**2)+(y**2))))
 
+    @classmethod
+    def b_to_d_rotation(cls, x: float, y: float, z: float, h: float, v: float) -> Tuple[float, float, float]:
+        """b_to_d_rotation performs rotation of coordinates horizontally and vertically
+
+        Parameters
+        ----------
+        x : float
+            the x-coordinate
+        y : float
+            the y-coordinate
+        z : float
+            the z-coordinate
+        h : float
+            the horizontal angle of rotation
+        v : float
+            the vertical angle of rotation
+
+        Returns
+        -------
+        Tuple[float, float, float]
+            the rotated x, y, and z coordinates
+        """
+        #rotated_x = x * math.cos(h) - (z * math.sin(h))
+        #rotated_y = x * math.cos(v) * math.sin(h) + y * math.sin(v) + z * math.cos(h) * math.cos(v)
+        #rotated_z = x * math.sin(h) * math.sin(v) - y * math.cos(v) + z * math.cos(h) * math.sin(v)
+        #pos_array = [rotated_x, rotated_y, rotated_z]
+
+        # rotated_x = x*(math.cos(h)) + y*(-math.cos(v)*math.sin(h)) + z*(math.sin(h)*math.sin(v))
+        # rotated_y = x*(0) + y*(math.sin(v)) + z*(math.cos(v))
+        # rotated_z = x*(-math.sin(h)) + y*(-math.cos(h)*math.cos(v)) + z*(math.cos(h)*math.sin(v))
+
+        rotated_x = x*(math.cos(h)) + y*(-math.cos(v)*math.sin(h)) + z*(math.sin(h)*math.sin(v))
+        rotated_y = x*(math.sin(h)) + y*(math.cos(v)*math.cos(h)) + z*(-math.cos(h)*math.sin(v))
+        rotated_z = x*(0) + y*(math.sin(v)) + z*(math.cos(v))
+        """
+        rotated_x = \
+            (x * cos(h)) + \
+            (sin(h) * cos(v) * (cls.Y_OFF - y)) + \
+            (sin(h) * sin(v) * z)
+        rotated_y = \
+            ((y - cls.Y_OFF) * sin(v)) + \
+            (z * cos(v))
+        rotated_z = \
+            (-x * sin(h)) + \
+            ((cls.Y_OFF - y) * cos(h) * cos(v)) + \
+            (z * cos(h) * sin(v))
+        """
+        return rotated_x, rotated_y, rotated_z
+
+class Utils:
+    """Utils are a set of more generic utilities needed for this program and handling data
+    """
+
+    @classmethod
+    def dump_json_default(cls, obj: Any) -> Union[Dict, str]:
+        """dump_json_default default function that dumps an object to a json format
+
+        Parameters
+        ----------
+        obj : Any
+            the object
+
+        Returns
+        -------
+        Union[Dict, str]
+            returns the obj.__dict__ or obj.__repr__
+        """
+        try:
+            return obj.__dict__
+        except AttributeError:
+            try:
+                str(obj)
+            except:
+                return object.__repr__(obj)
+
+    @classmethod
+    def dump_to_json(cls, data: Dict, file: str) -> None:
+        """dump_to_json dumps a Dict into a JSON
+
+        Parameters
+        ----------
+        data : Dict
+            the Dict to dump
+        file : str
+            the JSON filepath
+        """
+        with open(file, "w") as write_file:
+            json.dump(data, write_file, indent=4, default=Utils.dump_json_default)
+
+    @classmethod
+    def open_json(cls, file: str) -> Dict:
+        """open_json opens a JSON file
+
+        Parameters
+        ----------
+        file : str
+            the JSON filepath
+
+        Returns
+        -------
+        Dict
+            a dict representing the JSON objects in the file
+        """
+        with open(file, "r") as read_file:
+            return json.load(read_file)
+
+    @classmethod
+    def create_csv(cls, filepath: str, labels: list) -> None:
+        """create_csv creates a CSV file
+
+        Parameters
+        ----------
+        filepath : str
+            the filepath
+        labels : list
+            the labels (headers) for the csv row
+        """
+        with open(filepath, 'w+') as file:
+            writer = csv.writer(file, lineterminator='\r')
+            writer.writerow(labels)
+
+    @classmethod
+    def write_row_csv(cls, filepath: str, values: list) -> None:
+        """write_row_csv writes a list of values into a row in the CSV file
+
+        Parameters
+        ----------
+        filepath : str
+            the filepath
+        values : list
+            the values to write into a CSV row
+        """
+        with open(filepath, 'a+') as file:
+            writer = csv.writer(file, lineterminator='\r')
+            writer.writerow(values)
+
 class PacketInfo:
     """PacketInfo stores info on a data packet recieved from the IWR6843
     """
@@ -245,7 +397,7 @@ class DetectedObject:
         self.y = y
         self.z = z
         self.v = v
-        self.computed_range = range
+        self.computed_range = computed_range
         self.azimuth = azimuth
         self.elev_angle = elev_angle
         self.snr = snr
@@ -311,9 +463,156 @@ class DetectedObject:
         self.snr = snr
         self.noise = noise
         return
-
+    
     def __repr__(self) -> str:
-        return str(self.__dict__)
+        return f"{self.x}, {self.y}, {self.z}"
+
+class DetectedObjectVoxel(DetectedObject):
+    """DetectedObjectVoxel DetectedObjectVoxel stores info on a detected object parsed from a packet from the IWR6843 as well as functioning as a voxel
+    """
+    OBJECT_THRESHOLD = 3
+
+    def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, v: float = 0.0, computed_range: float = 0.0, azimuth: float = 0.0, elev_angle: float = 0.0, snr: float = 0.0, noise: float = 0.0, resolution: float = 0.04):
+        """__init__ initialize this object
+
+        Parameters
+        ----------
+        x : float, optional
+            the measured x coordinate of the object, by default 0.0
+        y : float, optional
+            the measured y coordinate of the object, by default 0.0
+        z : float, optional
+            the measured z coordinate of the object, by default 0.0
+        v : float, optional
+            the measured velocity of the object, by default 0.0
+        range : float, optional
+            the measured range of the object, by default 0.0
+        azimuth : float, optional
+            the measured azimuth angle of the object, by default 0.0
+        elev_angle : float, optional
+            the measured elevation angle of the object, by default 0.0
+        snr : float, optional
+            the measured signal to noise ratio of the object, by default 0.0
+        noise : float, optional
+            the measured noise of the object, by default 0.0
+        """
+        super(DetectedObjectVoxel, self).__init__(x,y,z,v,computed_range,azimuth,elev_angle,snr,noise)
+        self.resolution = resolution
+        self.x = self._round_pos_to_res(self.x)
+        self.y = self._round_pos_to_res(self.y)
+        self.z = self._round_pos_to_res(self.z)
+        self.hits = 1
+        self.is_object = False
+
+    def _round_pos_to_res(self, pos: float) -> float:
+        """_round_pos_to_res rounds a passed in position to the nearest interval of resolution used for the voxel
+
+        Parameters
+        ----------
+        pos : float
+            the position that is passed in
+
+        Returns
+        -------
+        float
+            the position rounded to the nearest interval of the resolution
+        """
+        return round(pos/self.resolution)*self.resolution
+
+    def _round_pos(self, pos: float) -> int:
+        """_round_pos rounds a passed in position by dividing the position by the resolution used for
+        the voxel so that hashing can occur on the position.
+
+        In order to properly hash this class for using a hash table, the positions need to be represented as
+        integers, as hashing does not typically occur on floating numbers.
+        Since the program relies upon rounding to the resolution used for the voxels, this function allows
+        the integers to be rounded towards an integer by dividing the position by the resolution, which
+        always results in a whole number.
+
+        Parameters
+        ----------
+        pos : float
+            the position that is passed in
+
+        Returns
+        -------
+        int
+            the position rounded to an integer by the division of the resolution
+        """
+        return int(pos/self.resolution)
+
+    def __hash__(self) -> int:
+        """__hash__ generates a hash for this voxel for a hash table
+
+        A hash is needed so that a hash table can be used efficiently to compare and iterate through different voxels.
+        Only the x, y, and z positions are used for hashing.
+
+        Returns
+        -------
+        int
+            the hash of this voxel
+        """
+        # Hashing function from here: https://dmauro.com/post/77011214305/a-hashing-function-for-x-y-z-coordinates
+        x = self._round_pos(self.x)
+        y = self._round_pos(self.y)
+        z = self._round_pos(self.z)
+        x = 2*x if x >= 0 else -2*x - 1
+        y = 2*y if y >= 0 else -2*y - 1
+        z = 2*z if z >= 0 else -2*z - 1
+        maximum = max([x, y, z])
+        hash = pow(maximum, 3) + (2 * maximum * z) + z
+        if (maximum == z):
+            hash += pow(max([x, y]), 2)
+        if (y >= x):
+            hash += x + y
+        else:
+            hash += y
+        return hash
+
+    def __eq__(self, other: object) -> bool:
+        """__eq__ compare this object to another object
+
+        Parameters
+        ----------
+        other : object
+            the other object
+
+        Returns
+        -------
+        bool
+            False if the other object is not an instance of this object, True if the hashes of the other object and this object are equal
+        """
+        if isinstance(other, DetectedObjectVoxel):
+            return other.__hash__() == self.__hash__()
+        else:
+            return False
+
+    def visit(self) -> None:
+        """visit visit this voxel
+        """
+        self.hits += 1
+        self.is_object = self.hits > self.OBJECT_THRESHOLD
+        return
+
+def compare_detected_object_voxels(kv1: Tuple[DetectedObjectVoxel, DetectedObjectVoxel], kv2: Tuple[DetectedObjectVoxel, DetectedObjectVoxel]) -> int:
+    """compare_detected_object_voxels key function to compare two detected object voxels
+
+    Parameters
+    ----------
+    kv1 : Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
+        a key, value pair of a detected object
+    kv2 : Tuple[DetectedObjectVoxel, DetectedObjectVoxel]
+        a key, value pair of a detected object
+
+    Returns
+    -------
+    int
+        the comparision value
+    """
+    # Get each voxel (key)
+    voxel1 = kv1[1]
+    voxel2 = kv2[1]
+    return (voxel1.x-voxel2.x)+(voxel1.y-voxel2.y)+(voxel1.z-voxel2.z)
 
 class PacketHandler:
     """PacketHandler handles and parses a packet from the IWR6843
@@ -321,6 +620,7 @@ class PacketHandler:
 
     # The byte size of a header
     HEADER_BYTE_SIZE: int = 40
+    OBJECT = DetectedObjectVoxel
 
     def __init__(self):
         pass
@@ -386,20 +686,22 @@ class PacketHandler:
         ParserStatus
             the status of the parsed packet
         """
-
-        if packet_info.header_start_index == -1:
-            return ParserStatus.TC_FAIL
-        elif packet_info.number_detected_objects < 0:
-            return ParserStatus.TC_FAIL
-        elif packet_info.sub_frame_number > 3:
-            return ParserStatus.TC_FAIL
-        elif (packet_info.header_start_index + packet_info.packet_length) > len(data):
-            return ParserStatus.TC_FAIL
-        else:
-            next_header_start_index = packet_info.header_start_index + packet_info.packet_length
-            if (next_header_start_index + 8) < packet_info.packet_length and \
-                    (BytesUtils.check_magic_pattern(data[next_header_start_index:next_header_start_index+8:1]) == 0):
+        try:
+            if packet_info.header_start_index == -1:
                 return ParserStatus.TC_FAIL
+            elif packet_info.number_detected_objects < 0:
+                return ParserStatus.TC_FAIL
+            elif packet_info.sub_frame_number > 3:
+                return ParserStatus.TC_FAIL
+            elif (packet_info.header_start_index + packet_info.packet_length) > len(data):
+                return ParserStatus.TC_FAIL
+            else:
+                next_header_start_index = packet_info.header_start_index + packet_info.packet_length
+                if (next_header_start_index + 8) < packet_info.packet_length and \
+                        (BytesUtils.check_magic_pattern(data[next_header_start_index:next_header_start_index+8:1]) == 0):
+                    return ParserStatus.TC_FAIL
+        except TypeError:
+            return ParserStatus.TC_FAIL
         return ParserStatus.TC_PASS
 
     @classmethod
@@ -421,7 +723,7 @@ class PacketHandler:
 
         detected_objects = []
         for _ in range(packet_info.number_detected_objects):
-            detected_objects.append(DetectedObject())
+            detected_objects.append(cls.OBJECT())
         tlv_start = packet_info.header_start_index + 40
         tlv_type = BytesUtils.get_uint32(data[(tlv_start+0):(tlv_start+4):1])
         tlv_len = BytesUtils.get_uint32(data[(tlv_start+4):(tlv_start+8):1])
@@ -440,10 +742,14 @@ class PacketHandler:
                 detected_objects[obj].tlv_type_1(x, y, z, v, computed_range, azimuth, elev_angle)
                 offset = offset + 16
 
-        tlv_start = tlv_start + 8 + tlv_len
-        tlv_type = BytesUtils.get_uint32(data[tlv_start+0:tlv_start+4:1])
-        tlv_len = BytesUtils.get_uint32(data[tlv_start+4:tlv_start+8:1])
-        offset = 8
+        try:
+            tlv_start = tlv_start + 8 + tlv_len
+            tlv_type = BytesUtils.get_uint32(data[tlv_start+0:tlv_start+4:1])
+            tlv_len = BytesUtils.get_uint32(data[tlv_start+4:tlv_start+8:1])
+            offset = 8
+        except TypeError:
+
+            tlv_type = None
 
         if tlv_type == 7:
             for obj in range(packet_info.number_detected_objects):
@@ -472,9 +778,10 @@ class PacketHandler:
         packet_info = cls._parse_packet_info(data)
         status = cls._get_status(data, packet_info)
         if status == ParserStatus.TC_PASS:
-            return cls._parse_tlvs(data, packet_info)
-        else:
-            return None
+            detected_objects = cls._parse_tlvs(data, packet_info)
+            if len(detected_objects) > 0:
+                return detected_objects
+        return None
 
 class Reader:
     """Reader reads from the data port of the IWR6843
