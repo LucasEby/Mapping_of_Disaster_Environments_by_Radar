@@ -2,14 +2,15 @@
 from typing import Union, List, Any
 from time import sleep
 from itertools import compress
-from glob import glob
 
 # Package Imports
 from serial import Serial, SerialException
+from serial.tools import list_ports
 from pymeasure.instruments.validators import truncated_range, strict_discrete_set
 
 # Self Imports
 from timer import Timer, TimeOutException
+
 
 class Utils:
     """Utils are utilities for this file
@@ -39,11 +40,13 @@ class Ports:
     """Ports stores the serial ports used to communicate with the IWR6843 chip
     """
 
+    SERIAL_CODE = "SER=00CF6"
     cli_port: Union[str, Serial]
     data_port: Union[str, Serial]
+    arduino_port: Union[str, Serial]
 
-    def __init__(self, attach_time: float = None, attach_to_ports: bool = True):
-        """__init__ [summary]
+    def __init__(self, attach_time: float = None, attach_to_ports: bool = True, find_arduino: bool = False):
+        """__init__ looks for the serial ports of the arduino if specified and the IWR6843 and attaches to the ports if specified
 
         Parameters
         ----------
@@ -51,35 +54,71 @@ class Ports:
             the time to wait to discover and attach to ports if specified, by default None
         attach_to_ports : bool, optional
             if True the class will attach to the found ports, if False the class will return the filepaths of the ports, by default True
+        find_arduino : bool, optional
+            if True the class will find the arduino, if False it will not find the arduino
 
         Raises
         ------
         TimeOutException
             if the class times out when searching for ports
-        """        
+        """
+        # Set objects meant to be global
         timer = None
+        cli_path = None
+        data_path = None
+        arduino_path = None
+        # Create timer if a timeout is set
         if attach_time:
             timer = Timer(attach_time)
         while True:
             try:
-                directories = glob("/dev/tty.SLAB_USBtoUART*")
-                if directories:
-                    if attach_to_ports:
-                        self.cli_port = Serial('/dev/tty.SLAB_USBtoUART', 115200, timeout=0.1)
-                        self.data_port = Serial(directories[1], 921600, timeout=0.1)
-                    else:
-                        self.cli_port = "/dev/tty.SLAB_USBtoUART"
-                        self.data_port = directories[1]
-                    break
+                # List the serial/comports
+                ports = list_ports.comports()
+                if ports:
+                    # Loop through each port
+                    for port in ports:
+                        name = port.name
+                        hwid = port.hwid
+                        # Attach CLI port
+                        if ("cu.SLAB_USBtoUART" in name) and (self.SERIAL_CODE in hwid) and (cli_path is None):
+                            cli_path = "/dev/" + name
+                        # Attach Data port
+                        elif ("cu.SLAB_USBtoUART" in name) and (self.SERIAL_CODE in hwid) and (data_path is None):
+                            data_path = "/dev/" + name
+                        # Attach Arduino/ESP32 port
+                        elif (("PID=1A86:7523" in hwid) or (("cu.SLAB_USBtoUART" in name) and ("SER=0001" in hwid))) and (arduino_path is None):
+                            arduino_path = "/dev/" + name
+                # Run the timer
                 if timer:
                     timer.run()
-            except (SerialException, IndexError):
+                # Set class data
+                if not(cli_path is None) and not(data_path is None) and (not(arduino_path is None) or (not(find_arduino))):
+                    # Attach to ports
+                    if attach_to_ports:
+                        self.cli_port = Serial(cli_path, 115200, timeout=0.1)
+                        self.data_port = Serial(data_path, 921600, timeout=0.1)
+                        if find_arduino:
+                            self.arduino_port = Serial(arduino_path, 9600, timeout=0.1)
+                    # Leave data as the paths
+                    else:
+                        self.cli_port = cli_path
+                        self.data_port = data_path
+                        if find_arduino:
+                            self.arduino_port = arduino_path
+                    break
+                # Keep on searching
+                else:
+                    continue
+            # Handle serial exception or index error and keep searching
+            except (SerialException, IndexError, OSError):
                 sleep(0.05)
                 continue
+            # Raise exception when a timeout occurs
             except TimeOutException:
                 raise TimeOutException(message="Searching for serial ports timed out after " + str(attach_time) + " seconds")
 
-        if attach_to_ports:
+        # Setup the CLI port and data port if attaching to ports and ports succesfully found
+        if attach_to_ports and not(cli_path is None) and not(data_path is None) and not(arduino_path is None):
             self.cli_port.reset_input_buffer()
             self.cli_port.reset_output_buffer()
             self.cli_port.flushInput()
@@ -167,8 +206,8 @@ class Control:
         self.configs[self.chirp_cfg] = self.chirp_cfg
         self.configs[self.frame_cfg] = self.frame_cfg
         self.configs[self.low_power] = self.low_power
-        #self.configs[self.adv_frame_cfg] = self.adv_frame_cfg
-        #self.configs[self.sub_frame_cfg] = self.sub_frame_cfg
+        # self.configs[self.adv_frame_cfg] = self.adv_frame_cfg
+        # self.configs[self.sub_frame_cfg] = self.sub_frame_cfg
         self.configs[self.gui_monitor] = self.gui_monitor
         self.configs[self.cfar_cfg] = self.cfar_cfg
         self.configs[self.multi_obj_beam_forming] = self.multi_obj_beam_forming
@@ -185,8 +224,8 @@ class Control:
         self.configs[self.aoa_fov_cfg] = self.aoa_fov_cfg
         self.configs[self.cfar_fov_cfg] = self.cfar_fov_cfg
         self.configs[self.calib_data] = self.calib_data
-        #self.configs[self.config_data_port] = self.config_data_port
-        #self.configs[self.query_demo_status] = self.query_demo_status
+        # self.configs[self.config_data_port] = self.config_data_port
+        # self.configs[self.query_demo_status] = self.query_demo_status
         self.configs[self.sensor_start] = self.sensor_start
 
     def _init_configuration(self, init_config_file: str) -> None:
@@ -255,12 +294,6 @@ class Control:
         List[str]
             the lines read from the CLI port
         """
-        #lines = []
-        #for _ in range(10000):
-        #    print(_, flush=True)
-        #    result = self.cli_port.read_until("\n".encode("latin-1"))
-        #    if result:
-        #        lines.append(result)
         lines = self.cli_port.readlines(10000)
         for i, line in enumerate(lines):
             line = line.decode().strip('\r\n')
@@ -472,7 +505,7 @@ class Config:
         AssertionError
             If the configuration needs to be set after rebooting the IWR6843
         """
-        #if self.need_reboot:
+        # if self.need_reboot:
         #    raise AssertionError("Must restart the board to setup this configuration")
         cmd = self.get_cmd()
         if cmd:
